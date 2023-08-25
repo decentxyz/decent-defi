@@ -1,0 +1,596 @@
+.gridShrink {
+  animation: grid-shrink 1s ease-in forwards paused;
+}
+
+@keyframes grid-shrink {
+  0% {
+    background-size: 10rem 10rem;
+  }
+
+  100% {
+    background-size: 5rem 5rem;
+  }
+}
+
+.titleGrow {
+  animation: title-grow 1s ease-in forwards paused;
+}
+
+@keyframes title-grow {
+  0% {
+    transform: scale(1);
+  }
+
+  100% {
+    transform: scale(3);
+  }
+}
+
+.boxSlide1 {
+  animation: box-slide1 1s linear forwards paused;
+}
+
+@keyframes box-slide1 {
+  0% {
+    transform: translate(0, 100%);
+    opacity: 0;
+  }
+
+  20% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+
+  25% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    transform: translate(-15%, -15%);
+    opacity: 1;
+  }
+}
+
+.boxSlide2 {
+  animation: box-slide2 1s linear forwards paused;
+}
+
+@keyframes box-slide2 {
+  0%,
+  20% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+
+  25% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+.boxSlide3 {
+  animation: box-slide3 1s linear forwards paused;
+}
+
+@keyframes box-slide3 {
+  0%,
+  20% {
+    transform: translate(0, 0);
+    opacity: 0;
+  }
+
+  25% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+
+  50%,
+  100% {
+    transform: translate(15%, 15%);
+    opacity: 1;
+  }
+}
+
+.textAppear1 {
+  animation: text-appear1 1s linear forwards paused;
+}
+
+@keyframes text-appear1 {
+  0%,
+  18% {
+    opacity: 0;
+  }
+
+  28%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.textAppear2 {
+  animation: text-appear2 1s linear forwards paused;
+}
+
+@keyframes text-appear2 {
+  0%,
+  24% {
+    opacity: 0;
+  }
+
+  34%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.textAppear3 {
+  animation: text-appear3 1s linear forwards paused;
+}
+
+@keyframes text-appear3 {
+  80% {
+    opacity: 0;
+    transform: translateY(50%);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.highlightText1::after {
+  animation: highlight-text1 1s linear forwards paused;
+  animation-delay: inherit;
+}
+
+@keyframes highlight-text1 {
+  0% {
+    opacity: 0;
+    right: 100%;
+  }
+  10% {
+    opacity: 1;
+  }
+  25%,
+  100% {
+    opacity: 1;
+    right: -6px;
+  }
+}
+
+.highlightText2::after {
+  animation: highlight-text2 1s linear forwards paused;
+  animation-delay: inherit;
+}
+
+@keyframes highlight-text2 {
+  0%,
+  10% {
+    opacity: 0;
+    right: 100%;
+  }
+  15% {
+    opacity: 1;
+  }
+  30%,
+  100% {
+    opacity: 1;
+    right: -6px;
+  }
+}
+
+.boxScoot1 {
+  animation: box-scoot1 1s linear forwards paused;
+}
+
+@keyframes box-scoot1 {
+  0%,
+  10% {
+    transform: translate(-159%, 0);
+  }
+
+  30%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.boxScoot2 {
+  animation: box-scoot2 1s linear forwards paused;
+}
+
+@keyframes box-scoot2 {
+  0%,
+  10% {
+    transform: translate(-53%, 0);
+  }
+
+  30%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.boxScoot3 {
+  animation: box-scoot3 1s linear forwards paused;
+}
+
+@keyframes box-scoot3 {
+  0%,
+  10% {
+    transform: translate(53%, 0);
+  }
+
+  30%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.boxScoot4 {
+  animation: box-scoot4 1s linear forwards paused;
+}
+
+@keyframes box-scoot4 {
+  0%,
+  10% {
+    transform: translate(159%, 0);
+  }
+
+  30%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.boxFadeSpinGrow {
+  animation: box-fade-spin-grow 1s ease-in forwards paused;
+  filter: invert(0.5);
+}
+
+@keyframes box-fade-spin-grow {
+  0%,
+  30% {
+    filter: none;
+    transform: none;
+  }
+  32% {
+    transform: scale(1.2);
+  }
+  39% {
+    filter: invert(0.5) brightness(2);
+  }
+  80%,
+  100% {
+    filter: invert(0.5) brightness(2);
+    transform: scale(18) rotate(720deg);
+  }
+}
+
+.gridGrow {
+  animation: grid-grow 1s linear forwards paused;
+}
+
+@keyframes grid-grow {
+  0% {
+    background-size: 5rem 5rem;
+  }
+
+  50%,
+  100% {
+    background-size: 6rem 6rem;
+  }
+}
+
+.whiteSwitch {
+  animation: white-switch 1s linear forwards paused;
+}
+
+@keyframes white-switch {
+  0%,
+  70% {
+    background-color: black;
+  }
+
+  71%,
+  100% {
+    background-color: white;
+  }
+}
+
+.lineSlide1 {
+  animation: line-slide1 1s linear forwards paused;
+  transform-origin: left;
+}
+
+@keyframes line-slide1 {
+  0%,
+  60% {
+    width: 0;
+  }
+
+  80%,
+  100% {
+    width: 100%;
+  }
+}
+
+.headSlide {
+  animation: text-slide1 1s linear forwards paused;
+  transform-origin: left;
+}
+
+@keyframes text-slide1 {
+  0%,
+  65% {
+    transform: translateY(100%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.highlightBadge1::after {
+  animation: highlight-badge1 1s linear forwards paused;
+  animation-delay: inherit;
+}
+
+@keyframes highlight-badge1 {
+  0% {
+    opacity: 0;
+    right: 80%;
+  }
+  10%,
+  100% {
+    opacity: 1;
+    right: -6px;
+  }
+}
+
+.highlightBadge2::after {
+  animation: highlight-badge2 1s linear forwards paused;
+  animation-delay: inherit;
+}
+
+@keyframes highlight-badge2 {
+  0%,
+  10% {
+    opacity: 0;
+    right: 80%;
+  }
+  20%,
+  100% {
+    opacity: 1;
+    right: -6px;
+  }
+}
+
+.highlightBadge3::after {
+  animation: highlight-badge3 1s linear forwards paused;
+  animation-delay: inherit;
+}
+
+@keyframes highlight-badge3 {
+  0%,
+  20% {
+    opacity: 0;
+    right: 80%;
+  }
+  30%,
+  100% {
+    opacity: 1;
+    right: -6px;
+  }
+}
+
+.textSlide1 {
+  animation: text-slide1 1s linear forwards paused;
+}
+
+@keyframes text-slide1 {
+  0% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  10%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.textSlide2 {
+  animation: text-slide2 1s linear forwards paused;
+}
+
+@keyframes text-slide2 {
+  0%,
+  5% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  15%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.textSlide3 {
+  animation: text-slide3 1s linear forwards paused;
+}
+
+@keyframes text-slide3 {
+  0%,
+  10% {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+
+  20%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.lineSlide2 {
+  animation: line-slide2 1s linear forwards paused;
+  transform-origin: left;
+}
+
+@keyframes line-slide2 {
+  0% {
+    width: 0;
+  }
+
+  10%,
+  100% {
+    width: 100%;
+  }
+}
+
+.lineSlide3 {
+  animation: line-slide3 1s linear forwards paused;
+  transform-origin: left;
+}
+
+@keyframes line-slide3 {
+  0%,
+  5% {
+    width: 0;
+  }
+
+  15%,
+  100% {
+    width: 100%;
+  }
+}
+
+.textBlockSlide1 {
+  animation: text-block-slide1 1s linear forwards paused;
+}
+
+@keyframes text-block-slide1 {
+  0%,
+  5% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  20%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.textBlockSlide2 {
+  animation: text-block-slide2 1s linear forwards paused;
+}
+
+@keyframes text-block-slide2 {
+  0%,
+  10% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  25%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.textBlockSlide3 {
+  animation: text-block-slide3 1s linear forwards paused;
+}
+
+@keyframes text-block-slide3 {
+  0%,
+  15% {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  30%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.flickerBox1,
+.flickerBox2,
+.flickerBox3,
+.flickerBox4,
+.flickerBox5,
+.flickerBox6,
+.flickerBox7,
+.flickerBox8 {
+  width: 14vw;
+  height: 14vw;
+  flex-shrink: 0;
+  border-right: 1px solid white;
+  animation: flicker 80s linear forwards infinite running;
+}
+
+.flickerBox1 {
+  animation-delay: 60s;
+  --flicker-color: #D1F279;
+}
+.flickerBox2 {
+  animation-delay: 0s;
+  --flicker-color: #FFCAA4;
+}
+
+.flickerBox3 {
+  animation-delay: 20s;
+  --flicker-color: #9969FF;
+}
+
+.flickerBox4 {
+  animation-delay: 70s;
+  --flicker-color: #D1F279;
+}
+.flickerBox5 {
+  animation-delay: 30s;
+  --flicker-color: #FFCAA4;
+}
+.flickerBox6 {
+  animation-delay: 50s;
+  --flicker-color: #9969FF;
+}
+.flickerBox7 {
+  animation-delay: 10s;
+  --flicker-color: #D1F279;
+}
+.flickerBox8 {
+  animation-delay: 40s;
+  --flicker-color: #FFCAA4;
+}
+@keyframes flicker {
+  0%,
+  14%,
+  100% {
+    background-color: black;
+  }
+
+  6%,
+  8% {
+    background-color: var(--flicker-color);
+  }
+}
