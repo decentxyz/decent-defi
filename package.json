@@ -1,7 +1,6 @@
 {
   "name": "@decent.xyz/box-examples",
   "version": "0.1.0",
-  "private": true,
   "scripts": {
     "dev": "next dev -p 3001",
     "build": "next build",
@@ -9,9 +8,11 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@decent.xyz/the-box": "file:./decent.xyz-the-box-1.0.8.tgz",
+    "@decent.xyz/the-box": "file:decent.xyz-the-box-1.0.14.tgz",
+    "@rainbow-me/rainbowkit": "^1.0.4",
     "@types/node": "18.15.11",
     "@types/react": "18.0.35",
+    "@wagmi/core": "1.3.9",
     "autoprefixer": "10.4.14",
     "clsx": "^1.2.1",
     "next": "13.3.0",
@@ -22,10 +23,8 @@
     "swr": "^2.2.0",
     "tailwindcss": "^3.3.1",
     "typescript": "5.0.4",
-    "@wagmi/core": "1.3.9",
-    "wagmi": "1.3.9",
     "viem": "1.5.3",
-    "@rainbow-me/rainbowkit": "^1.0.4"
+    "wagmi": "1.3.9"
   },
   "devDependencies": {
     "eslint": "8.38.0"
