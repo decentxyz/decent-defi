@@ -13,13 +13,7 @@ import localFont from 'next/font/local';
 // Default styles that can be overridden by your app
 import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets';
 import { arbitrum, mainnet, optimism, polygon, base } from 'wagmi/chains';
-
-if (process.env.NODE_ENV !== 'development') {
-  // @ts-ignore
-  import('@decent.xyz/the-box/index.css').then(() => {
-    console.log('💅🏼 box styles imported');
-  });
-}
+import '@decent.xyz/the-box/index.css';
 
 const getAlchemyProviders = () => {
   const providers: ReturnType<typeof alchemyProvider>[] = [];
