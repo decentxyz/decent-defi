@@ -3,14 +3,18 @@ import {
   BoxHooksContextProvider,
   useUsersBalances,
 } from '@decent.xyz/box-hooks';
+
 import {
   ChainSelector,
   ClientRendered,
   TokenSelector,
+  ChainId,
+  ethGasToken,
+  TokenInfo,
 } from '@decent.xyz/box-ui';
+
 import { CodeBlock, H1, H2, P, prettyPrint } from '@/pages/boxHooks';
 import { useState } from 'react';
-import { ChainId, ethGasToken, TokenInfo } from '@decent.xyz/box-common';
 import { useAccount } from 'wagmi';
 
 const ChainSelectorUsage = () => {

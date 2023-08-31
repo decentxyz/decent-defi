@@ -4,8 +4,10 @@ import {
   BoxHooksContextProvider,
   useBoxAction,
   UseBoxActionArgs,
+  ActionType,
+  ChainId,
+  bigintSerializer,
 } from '@decent.xyz/box-hooks';
-import { ActionType, bigintSerializer, ChainId } from '@decent.xyz/box-common';
 import { parseUnits } from 'viem';
 import { useAccount } from 'wagmi';
 import { ClientRendered } from '@decent.xyz/box-ui';
