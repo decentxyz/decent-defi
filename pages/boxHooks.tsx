@@ -1,38 +1,23 @@
 import { Layout } from '@/components/Layouts/Layout';
-import { PropsWithChildren } from 'react';
+import { useState } from 'react';
 import {
+  ActionType,
+  bigintSerializer,
   BoxHooksContextProvider,
+  ChainId,
+  EvmTransaction,
+  getChainExplorerTxLink,
   useBoxAction,
   UseBoxActionArgs,
-  ActionType,
-  ChainId,
-  bigintSerializer,
 } from '@decent.xyz/box-hooks';
-import { parseUnits } from 'viem';
-import { useAccount } from 'wagmi';
+import { EstimateGasParameters, Hex, parseUnits } from 'viem';
+import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
 import { ClientRendered } from '@decent.xyz/box-ui';
+import { getAccount, getPublicClient, sendTransaction } from '@wagmi/core';
+import { Button, CodeBlock, H1, H2, P } from '@/components/common';
 
 export const prettyPrint = (obj: any) =>
   JSON.stringify(obj, bigintSerializer, 2);
-export const H1 = ({ children }: PropsWithChildren) => (
-  <h1 className={'text-6xl mb-4'}>{children}</h1>
-);
-
-export const H2 = ({ children }: PropsWithChildren) => (
-  <h1 className={'text-3xl mb-3'}>{children}</h1>
-);
-
-export const P = ({ children }: PropsWithChildren) => (
-  <p className={'text-xl mb-2'}>{children}</p>
-);
-
-export const CodeBlock = ({ children }: PropsWithChildren) => (
-  <div
-    className={'max-w-6xl overflow-auto ' + 'bg-indigo-100 p-3 rounded-2xl '}
-  >
-    <pre>{children}</pre>
-  </div>
-);
 
 export const BoxActionUser = ({
   getActionArgs,
@@ -40,6 +25,9 @@ export const BoxActionUser = ({
   getActionArgs: UseBoxActionArgs;
 }) => {
   const { actionResponse, isLoading, error } = useBoxAction(getActionArgs);
+  const [hash, setHash] = useState<Hex>();
+  const { switchNetworkAsync } = useSwitchNetwork();
+  const { chain } = useNetwork();
 
   if (error) {
     return <CodeBlock>Error fetching: {prettyPrint(error)}</CodeBlock>;
@@ -47,7 +35,44 @@ export const BoxActionUser = ({
   if (isLoading || !actionResponse) {
     return <CodeBlock>Fetching box action...</CodeBlock>;
   }
-  return <CodeBlock>{prettyPrint(actionResponse)}</CodeBlock>;
+  const { srcChainId } = getActionArgs;
+  return (
+    <div className={'max-w-4xl'}>
+      <CodeBlock className={'mb-4'}>{prettyPrint(actionResponse)}</CodeBlock>
+      <Button
+        onClick={async () => {
+          const account = getAccount();
+          const publicClient = getPublicClient();
+          if (chain?.id !== srcChainId) {
+            await switchNetworkAsync?.(srcChainId);
+          }
+          const tx = actionResponse.tx as EvmTransaction;
+          const gas = await publicClient.estimateGas({
+            account,
+            ...tx,
+          } as unknown as EstimateGasParameters);
+          const response = await sendTransaction({
+            ...tx,
+            gas,
+          });
+          setHash(response.hash);
+        }}
+      >
+        Send This Tx!
+      </Button>
+      {hash && (
+        <>
+          <P>TX Hash: {hash}</P>
+          <a
+            href={getChainExplorerTxLink(srcChainId, hash)}
+            className={'text-blue-500'}
+          >
+            watch this on explorer
+          </a>
+        </>
+      )}
+    </div>
+  );
 };
 
 export const Usage = () => {

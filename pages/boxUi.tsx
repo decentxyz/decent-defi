@@ -13,9 +13,10 @@ import {
   TokenInfo,
 } from '@decent.xyz/box-ui';
 
-import { CodeBlock, H1, H2, P, prettyPrint } from '@/pages/boxHooks';
+import { prettyPrint } from '@/pages/boxHooks';
 import { useState } from 'react';
 import { useAccount } from 'wagmi';
+import { CodeBlock, H1, H2, P } from '@/components/common';
 
 const ChainSelectorUsage = () => {
   const [chain, setChain] = useState<ChainId>(ChainId.ETHEREUM);
@@ -70,6 +71,8 @@ const TokenSelectorUsage = () => {
       </div>
       <P>Your Selected Token: srcToken</P>
       <CodeBlock>{prettyPrint(srcToken)}</CodeBlock>
+      <P>Your Fetched Balances</P>
+      <CodeBlock>{prettyPrint(tokens)}</CodeBlock>
     </div>
   );
 };
