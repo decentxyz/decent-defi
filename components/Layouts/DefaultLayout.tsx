@@ -2,32 +2,21 @@ import React, { ReactNode } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 import styles from '@/styles/splash-animation.module.css';
-import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
+import { Layout } from '@/components/Layouts/Layout';
 
 type DefaultLayoutProps = {
   title?: string;
   image?: string;
-  showSolana?: boolean;
   children: ReactNode;
 };
 
-const DefaultLayout = ({
+export const DefaultLayout = ({
   title,
   image,
   children,
-  showSolana,
 }: DefaultLayoutProps) => {
   return (
-    <div>
-      <nav
-        className={clsx(
-          'flex flex-wrap items-center justify-end gap-1',
-          'fixed inset-0 bottom-auto z-10',
-          'my-8 mx-4 md:mx-20'
-        )}
-      >
-        <RainbowConnectButton />
-      </nav>
+    <Layout>
       <div className="relative">
         <div className="bg-gradient-conic sticky top-0">
           <div
@@ -71,8 +60,6 @@ const DefaultLayout = ({
           </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
-
-export default DefaultLayout;
