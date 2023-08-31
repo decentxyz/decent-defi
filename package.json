@@ -8,9 +8,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@decent.xyz/box-hooks": "workspace:*",
-    "@decent.xyz/box-ui": "workspace:*",
-    "@decent.xyz/the-box": "^1.1.26",
+    "@decent.xyz/box-hooks": "^1.0.3",
+    "@decent.xyz/box-ui": "^1.0.3",
+    "@decent.xyz/the-box": "^1.1.27",
     "@rainbow-me/rainbowkit": "^1.0.9",
     "@types/node": "18.15.11",
     "@wagmi/core": "1.3.9",
