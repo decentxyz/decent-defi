@@ -2,14 +2,14 @@ import { Layout } from '@/components/Layouts/Layout';
 import { useState } from 'react';
 import {
   BoxHooksContextProvider,
-  BoxCommon,
   useBoxAction,
   UseBoxActionArgs,
   EvmTransaction,
+  ActionType,
+  bigintSerializer,
+  ChainId,
+  getChainExplorerTxLink,
 } from '@decent.xyz/box-hooks';
-
-const { ActionType, bigintSerializer, ChainId, getChainExplorerTxLink } =
-  BoxCommon;
 
 import { EstimateGasParameters, Hex, parseUnits } from 'viem';
 import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
