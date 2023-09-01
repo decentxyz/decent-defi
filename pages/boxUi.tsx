@@ -8,10 +8,12 @@ import {
   ChainSelector,
   ClientRendered,
   TokenSelector,
-  ChainId,
-  ethGasToken,
+  BoxCommon,
   TokenInfo,
+  ChainId,
 } from '@decent.xyz/box-ui';
+
+const { ethGasToken } = BoxCommon;
 
 import { prettyPrint } from '@/pages/boxHooks';
 import { useState } from 'react';
@@ -19,7 +21,7 @@ import { useAccount } from 'wagmi';
 import { CodeBlock, H1, H2, P } from '@/components/common';
 
 const ChainSelectorUsage = () => {
-  const [chain, setChain] = useState<ChainId>(ChainId.ETHEREUM);
+  const [chain, setChain] = useState< ChainId>(ChainId.ETHEREUM);
   return (
     <div>
       <div className={'mt-10'}>

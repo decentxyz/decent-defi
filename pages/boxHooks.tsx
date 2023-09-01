@@ -1,15 +1,16 @@
 import { Layout } from '@/components/Layouts/Layout';
 import { useState } from 'react';
 import {
-  ActionType,
-  bigintSerializer,
   BoxHooksContextProvider,
-  ChainId,
-  EvmTransaction,
-  getChainExplorerTxLink,
+  BoxCommon,
   useBoxAction,
   UseBoxActionArgs,
+  EvmTransaction,
 } from '@decent.xyz/box-hooks';
+
+const { ActionType, bigintSerializer, ChainId, getChainExplorerTxLink } =
+  BoxCommon;
+
 import { EstimateGasParameters, Hex, parseUnits } from 'viem';
 import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
 import { ClientRendered } from '@decent.xyz/box-ui';
