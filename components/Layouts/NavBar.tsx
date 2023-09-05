@@ -13,7 +13,7 @@ export const NavBar = () => {
           height={40}
           width={48}
         />
-        <p className="uppercase mx-auto text-3xl font-light">Click. Mint.</p>
+        <p className="uppercase mx-auto text-3xl font-light">Click. Transact.</p>
       </div>
       <div
         className={clsx(
