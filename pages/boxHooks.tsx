@@ -9,12 +9,13 @@ import {
   bigintSerializer,
   ChainId,
   getChainExplorerTxLink,
+  useBridgeReceipt,
 } from '@decent.xyz/box-hooks';
 
-import { EstimateGasParameters, Hex, parseUnits } from 'viem';
+import { EstimateGasParameters, Hex, parseUnits, TransactionReceipt } from 'viem';
 import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
 import { ClientRendered } from '@decent.xyz/box-ui';
-import { getAccount, getPublicClient, sendTransaction } from '@wagmi/core';
+import { getAccount, getPublicClient, sendTransaction, waitForTransaction } from '@wagmi/core';
 import { Button, CodeBlock, H1, H2, P } from '@/components/common';
 
 export const prettyPrint = (obj: any) =>
@@ -29,6 +30,16 @@ export const BoxActionUser = ({
   const [hash, setHash] = useState<Hex>();
   const { switchNetworkAsync } = useSwitchNetwork();
   const { chain } = useNetwork();
+  const bridgeId = actionResponse?.bridgeId;
+  const { srcChainId, dstChainId } = getActionArgs;
+  const [srcTxReceipt, setSrcTxReceipt] = useState<TransactionReceipt>();
+  const { receipt: _dstTxReceipt } = useBridgeReceipt({
+    bridgeId,
+    srcChainId,
+    dstChainId,
+    srcTxHash: hash,
+  });
+  const dstTxReceipt = _dstTxReceipt as TransactionReceipt;
 
   if (error) {
     return <CodeBlock>Error fetching: {prettyPrint(error)}</CodeBlock>;
@@ -36,41 +47,63 @@ export const BoxActionUser = ({
   if (isLoading || !actionResponse) {
     return <CodeBlock>Fetching box action...</CodeBlock>;
   }
-  const { srcChainId } = getActionArgs;
+
   return (
     <div className={'max-w-4xl'}>
       <CodeBlock className={'mb-4'}>{prettyPrint(actionResponse)}</CodeBlock>
       <Button
         onClick={async () => {
-          const account = getAccount();
-          const publicClient = getPublicClient();
-          if (chain?.id !== srcChainId) {
-            await switchNetworkAsync?.(srcChainId);
+          try {
+            const account = getAccount();
+            const publicClient = getPublicClient();
+            if (chain?.id !== srcChainId) {
+              await switchNetworkAsync?.(srcChainId);
+            }
+            const tx = actionResponse.tx as EvmTransaction;
+            const gas = await publicClient.estimateGas({
+              account,
+              ...tx,
+            } as unknown as EstimateGasParameters);
+            const { hash } = await sendTransaction({
+              ...tx,
+              gas,
+            });
+            setHash(hash);
+            // catch viem polygon error
+            try {
+              const receipt = await waitForTransaction({ hash });
+              setSrcTxReceipt(receipt);
+            } catch(e) {}
+          } catch (e) {
+            console.error(e);
           }
-          const tx = actionResponse.tx as EvmTransaction;
-          const gas = await publicClient.estimateGas({
-            account,
-            ...tx,
-          } as unknown as EstimateGasParameters);
-          const response = await sendTransaction({
-            ...tx,
-            gas,
-          });
-          setHash(response.hash);
         }}
       >
         Send This Tx!
       </Button>
       {hash && (
-        <>
-          <P>TX Hash: {hash}</P>
+        <div className={'mt-6'}>
+          <H2>TX Hash:</H2>
+          <CodeBlock>{srcTxReceipt ? hash : 'Waiting for tx confirmation...'}</CodeBlock>
           <a
             href={getChainExplorerTxLink(srcChainId, hash)}
             className={'text-blue-500'}
           >
-            watch this on explorer
+            view on explorer
           </a>
-        </>
+        </div>
+      )}
+      {srcTxReceipt && srcChainId !== dstChainId && (
+        <div className={'mt-6'}>
+          <H2>Bridged TX Hash:</H2>
+          <CodeBlock>{dstTxReceipt ? dstTxReceipt.transactionHash : 'Waiting for bridged tx confirmation...'}</CodeBlock>
+          {dstTxReceipt?.transactionHash && <a
+            href={getChainExplorerTxLink(dstChainId, dstTxReceipt?.transactionHash)}
+            className={'text-blue-500'}
+          >
+            view on explorer
+          </a>}
+        </div>
       )}
     </div>
   );
