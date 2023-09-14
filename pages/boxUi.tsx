@@ -6,12 +6,12 @@ import {
 } from '@decent.xyz/box-hooks';
 
 import {
+  ChainId,
   ChainSelector,
   ClientRendered,
-  TokenSelector,
   ethGasToken,
   TokenInfo,
-  ChainId,
+  TokenSelector,
 } from '@decent.xyz/box-ui';
 
 import { prettyPrint } from '@/pages/boxHooks';
@@ -20,7 +20,15 @@ import { useAccount } from 'wagmi';
 import { CodeBlock, H1, H2, P } from '@/components/common';
 
 const ChainSelectorUsage = () => {
-  const [chain, setChain] = useState<ChainId>(ChainId.ETHEREUM);
+  const chains = [
+    ChainId.ARBITRUM,
+    ChainId.OPTIMISM,
+    ChainId.GOERLI,
+    ChainId.BASE,
+  ];
+
+  const [chain, setChain] = useState<ChainId>(chains[0]);
+
   return (
     <div>
       <div className={'mt-10'}>
@@ -28,7 +36,11 @@ const ChainSelectorUsage = () => {
       </div>
       <div className={'mb-5 flex'}>
         <div className={'flex bg-white rounded p-3'}>
-          <ChainSelector srcChainId={chain} setSrcChainId={setChain} />
+          <ChainSelector
+            srcChainId={chain}
+            setSrcChainId={setChain}
+            chains={chains}
+          />
         </div>
       </div>
       <P>Selected Chain: {chain}</P>
