@@ -14,6 +14,7 @@ import localFont from 'next/font/local';
 import { metaMaskWallet } from '@rainbow-me/rainbowkit/wallets';
 import { arbitrum, mainnet, optimism, polygon, base } from 'wagmi/chains';
 import '@decent.xyz/the-box/index.css';
+import { arbitrumGoerli } from 'viem/chains';
 
 const getAlchemyProviders = () => {
   const providers: ReturnType<typeof alchemyProvider>[] = [];
@@ -27,7 +28,7 @@ const getAlchemyProviders = () => {
 };
 
 const { chains, publicClient } = configureChains(
-  [mainnet, arbitrum, optimism, polygon, base],
+  [mainnet, arbitrum, optimism, polygon, base, arbitrumGoerli],
   [
     // @ts-ignore
     ...getAlchemyProviders(),

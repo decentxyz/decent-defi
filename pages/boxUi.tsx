@@ -37,7 +37,7 @@ const ChainSelectorUsage = () => {
 };
 const TokenSelectorUsage = () => {
   const { address } = useAccount();
-  const chainId = ChainId.ARBITRUM;
+  const chainId = ChainId.ARBITRUM_TESTNET;
   const [srcToken, setSrcToken] = useState<TokenInfo>(ethGasToken);
 
   const { tokens } = useUsersBalances({

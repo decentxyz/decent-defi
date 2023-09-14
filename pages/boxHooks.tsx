@@ -12,10 +12,20 @@ import {
   useBridgeReceipt,
 } from '@decent.xyz/box-hooks';
 
-import { EstimateGasParameters, Hex, parseUnits, TransactionReceipt } from 'viem';
+import {
+  EstimateGasParameters,
+  Hex,
+  parseUnits,
+  TransactionReceipt,
+} from 'viem';
 import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
 import { ClientRendered } from '@decent.xyz/box-ui';
-import { getAccount, getPublicClient, sendTransaction, waitForTransaction } from '@wagmi/core';
+import {
+  getAccount,
+  getPublicClient,
+  sendTransaction,
+  waitForTransaction,
+} from '@wagmi/core';
 import { Button, CodeBlock, H1, H2, P } from '@/components/common';
 
 export const prettyPrint = (obj: any) =>
@@ -73,7 +83,7 @@ export const BoxActionUser = ({
             try {
               const receipt = await waitForTransaction({ hash });
               setSrcTxReceipt(receipt);
-            } catch(e) {}
+            } catch (e) {}
           } catch (e) {
             console.error(e);
           }
@@ -84,7 +94,9 @@ export const BoxActionUser = ({
       {hash && (
         <div className={'mt-6'}>
           <H2>TX Hash:</H2>
-          <CodeBlock>{srcTxReceipt ? hash : 'Waiting for tx confirmation...'}</CodeBlock>
+          <CodeBlock>
+            {srcTxReceipt ? hash : 'Waiting for tx confirmation...'}
+          </CodeBlock>
           <a
             href={getChainExplorerTxLink(srcChainId, hash)}
             className={'text-blue-500'}
@@ -96,13 +108,22 @@ export const BoxActionUser = ({
       {srcTxReceipt && srcChainId !== dstChainId && (
         <div className={'mt-6'}>
           <H2>Bridged TX Hash:</H2>
-          <CodeBlock>{dstTxReceipt ? dstTxReceipt.transactionHash : 'Waiting for bridged tx confirmation...'}</CodeBlock>
-          {dstTxReceipt?.transactionHash && <a
-            href={getChainExplorerTxLink(dstChainId, dstTxReceipt?.transactionHash)}
-            className={'text-blue-500'}
-          >
-            view on explorer
-          </a>}
+          <CodeBlock>
+            {dstTxReceipt
+              ? dstTxReceipt.transactionHash
+              : 'Waiting for bridged tx confirmation...'}
+          </CodeBlock>
+          {dstTxReceipt?.transactionHash && (
+            <a
+              href={getChainExplorerTxLink(
+                dstChainId,
+                dstTxReceipt?.transactionHash
+              )}
+              className={'text-blue-500'}
+            >
+              view on explorer
+            </a>
+          )}
         </div>
       )}
     </div>
