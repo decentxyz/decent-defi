@@ -11,7 +11,7 @@ import {
   ClientRendered,
   ethGasToken,
   TokenInfo,
-  TokenSelector,
+  SimpleTokenSelector,
 } from '@decent.xyz/box-ui';
 
 import { prettyPrint } from '@/pages/boxHooks';
@@ -71,7 +71,7 @@ const TokenSelectorUsage = () => {
         {tokens ? (
           <div className={'mb-5 flex'}>
             <div className={'flex bg-white rounded p-3'}>
-              <TokenSelector
+              <SimpleTokenSelector
                 srcToken={srcToken}
                 setSrcToken={setSrcToken}
                 tokens={tokens}
