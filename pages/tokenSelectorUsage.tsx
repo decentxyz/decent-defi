@@ -8,7 +8,7 @@ import {
 import { useState } from 'react';
 import { CodeBlock, H2, P } from '@/components/common';
 import { prettyPrint } from '@/pages/boxHooks';
-import { BoxHooksContextProvider } from '../../../packages/box-hooks';
+import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 
 export const TokenSelectorUsage = ({ chainId }: { chainId: ChainId }) => {
   const { address } = useAccount();
