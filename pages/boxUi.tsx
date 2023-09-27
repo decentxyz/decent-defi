@@ -1,96 +1,16 @@
 import { Layout } from '@/components/Layouts/Layout';
 
-import {
-  BoxHooksContextProvider,
-  useUsersBalances,
-} from '@decent.xyz/box-hooks';
+import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 
-import {
-  ChainId,
-  ChainSelector,
-  ClientRendered,
-  ethGasToken,
-  TokenInfo,
-  SimpleTokenSelector,
-} from '@decent.xyz/box-ui';
-
-import { prettyPrint } from '@/pages/boxHooks';
+import { ChainId, ClientRendered } from '@decent.xyz/box-ui';
+import { CodeBlock, H1, P } from '@/components/common';
+import { SimpleTokenSelectorUsage } from '@/pages/simpleTokenSelectorUsage';
+import { ChainSelectorUsage } from '@/pages/chainSelectorUsage';
 import { useState } from 'react';
-import { useAccount } from 'wagmi';
-import { CodeBlock, H1, H2, P } from '@/components/common';
+import { TokenSelectorUsage } from '@/pages/tokenSelectorUsage';
 
-const ChainSelectorUsage = () => {
-  const chains = [
-    ChainId.ARBITRUM,
-    ChainId.OPTIMISM,
-    ChainId.GOERLI,
-    ChainId.BASE,
-  ];
-
-  const [chain, setChain] = useState<ChainId>(chains[0]);
-
-  return (
-    <div>
-      <div className={'mt-10'}>
-        <H2>Chain Selector</H2>
-      </div>
-      <div className={'mb-5 flex'}>
-        <div className={'flex bg-white rounded p-3'}>
-          <ChainSelector
-            srcChainId={chain}
-            setSrcChainId={setChain}
-            chains={chains}
-          />
-        </div>
-      </div>
-      <P>Selected Chain: {chain}</P>
-    </div>
-  );
-};
-const TokenSelectorUsage = () => {
-  const { address } = useAccount();
-  const chainId = ChainId.ARBITRUM_TESTNET;
-  const [srcToken, setSrcToken] = useState<TokenInfo>(ethGasToken);
-
-  const { tokens } = useUsersBalances({
-    address: address!,
-    chainId,
-    enable: Boolean(address),
-  });
-
-  const header = <H2>Token Selector</H2>;
-
-  if (!address) {
-    return <div>Please Connect your wallet.</div>;
-  }
-
-  return (
-    <div>
-      {header}
-      <div>
-        {tokens ? (
-          <div className={'mb-5 flex'}>
-            <div className={'flex bg-white rounded p-3'}>
-              <SimpleTokenSelector
-                srcToken={srcToken}
-                setSrcToken={setSrcToken}
-                tokens={tokens}
-              />
-            </div>
-          </div>
-        ) : (
-          <P>Fetching your balances...</P>
-        )}
-      </div>
-      <P>Your Selected Token: srcToken</P>
-      <CodeBlock>{prettyPrint(srcToken)}</CodeBlock>
-      <P>Your Fetched Balances</P>
-      <CodeBlock>{prettyPrint(tokens)}</CodeBlock>
-    </div>
-  );
-};
 export default function ExamplePage() {
-  const { address } = useAccount();
+  const [chainId, setChainId] = useState<ChainId>(ChainId.ARBITRUM);
 
   return (
     <Layout>
@@ -104,9 +24,15 @@ export default function ExamplePage() {
             >
               <div className={'max-w-5xl '}>
                 <H1>Box UI</H1>
+                <P>Note: to properly load the styles, be sure to include:</P>
+                <CodeBlock>
+                  {`import '@decent.xyz/box-ui/index.css';`}
+                </CodeBlock>
+                <P>At the top-level of your NextJS/React application.</P>
                 <P>Below you can see the usage of the box hooks.</P>
-                <ChainSelectorUsage />
-                <TokenSelectorUsage />
+                <ChainSelectorUsage chainId={chainId} setChainId={setChainId} />
+                <TokenSelectorUsage chainId={chainId} />
+                <SimpleTokenSelectorUsage chainId={chainId} />
               </div>
             </BoxHooksContextProvider>
           </ClientRendered>

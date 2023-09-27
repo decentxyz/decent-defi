@@ -1,11 +1,14 @@
 import { ActionType, ChainId, TheBox } from '@decent.xyz/the-box';
 import { parseUnits } from 'viem';
 import { Layout } from '@/components/Layouts/Layout';
+import { CodeBlock, P } from '@/components/common';
 
 export default function ExamplePage() {
   return (
     <Layout>
       <h1 className={'font-semibold text-2xl mb-2'}>The Box Example</h1>
+      <P>Note: to properly load the styles, be sure to include:</P>
+      <CodeBlock>{`import '@decent.xyz/the-box/index.css';`}</CodeBlock>
       <TheBox
         className="rounded-lg border shadow-md bg-white dark"
         paymentButtonText="MINT ME"

@@ -18,7 +18,9 @@ export const CodeBlock = ({
 }: HTMLAttributes<HTMLDivElement>) => (
   <div
     className={
-      'max-w-6xl overflow-auto ' + 'bg-indigo-100 p-3 rounded-2xl ' + className
+      'max-w-6xl overflow-auto ' +
+      'bg-indigo-100 p-3 rounded-2xl my-5 ' +
+      className
     }
   >
     <pre>{children}</pre>
