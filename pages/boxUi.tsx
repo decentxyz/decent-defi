@@ -4,10 +4,10 @@ import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 
 import { ChainId, ClientRendered } from '@decent.xyz/box-ui';
 import { CodeBlock, H1, P } from '@/components/common';
-import { SimpleTokenSelectorUsage } from '@/pages/simpleTokenSelectorUsage';
-import { ChainSelectorUsage } from '@/pages/chainSelectorUsage';
+import { SimpleTokenSelectorUsage } from '@/components/SimpleTokenSelectorUsage';
+import { ChainSelectorUsage } from '@/components/ChainSelectorUsage';
 import { useState } from 'react';
-import { TokenSelectorUsage } from '@/pages/tokenSelectorUsage';
+import { TokenSelectorUsage } from '@/components/TokenSelectorUsage';
 
 export default function ExamplePage() {
   const [chainId, setChainId] = useState<ChainId>(ChainId.ARBITRUM);
