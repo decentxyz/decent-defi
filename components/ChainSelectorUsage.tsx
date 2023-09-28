@@ -26,6 +26,7 @@ export const ChainSelectorUsage = ({
             srcChainId={chainId}
             setSrcChainId={setChainId}
             chains={chains}
+            title={"⛓️"}
           />
         </div>
       </div>
