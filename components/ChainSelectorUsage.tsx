@@ -1,5 +1,6 @@
-import { ChainId, ChainSelector } from '@decent.xyz/box-ui';
 import { H2, P } from '@/components/common';
+import { ChainId } from '@decent.xyz/box-common';
+import { ChainSelector } from '@decent.xyz/box-ui';
 
 export const ChainSelectorUsage = ({
   chainId,
@@ -26,7 +27,7 @@ export const ChainSelectorUsage = ({
             srcChainId={chainId}
             setSrcChainId={setChainId}
             chains={chains}
-            title={"⛓️"}
+            title={'⛓️'}
           />
         </div>
       </div>

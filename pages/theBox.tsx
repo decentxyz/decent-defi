@@ -1,7 +1,8 @@
-import { ActionType, ChainId, TheBox } from '@decent.xyz/the-box';
+import { TheBox } from '@decent.xyz/the-box';
 import { parseUnits } from 'viem';
 import { Layout } from '@/components/Layouts/Layout';
 import { CodeBlock, P } from '@/components/common';
+import { ActionType, ChainId } from '@decent.xyz/box-common';
 
 export default function ExamplePage() {
   return (

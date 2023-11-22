@@ -1,14 +1,10 @@
 import { useAccount } from 'wagmi';
-import {
-  ChainId,
-  ethGasToken,
-  SimpleTokenSelector,
-  TokenInfo,
-} from '@decent.xyz/box-ui';
+import { SimpleTokenSelector } from '@decent.xyz/box-ui';
 import { useState } from 'react';
 import { useUsersBalances } from '@decent.xyz/box-hooks';
 import { CodeBlock, H2, P } from '@/components/common';
 import { prettyPrint } from '@/pages/boxHooks';
+import { ChainId, ethGasToken, TokenInfo } from '@decent.xyz/box-common';
 
 export const SimpleTokenSelectorUsage = ({ chainId }: { chainId: ChainId }) => {
   const { address } = useAccount();

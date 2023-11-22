@@ -2,12 +2,13 @@ import { Layout } from '@/components/Layouts/Layout';
 
 import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 
-import { ChainId, ClientRendered } from '@decent.xyz/box-ui';
+import { ClientRendered } from '@decent.xyz/box-ui';
 import { CodeBlock, H1, P } from '@/components/common';
 import { SimpleTokenSelectorUsage } from '@/components/SimpleTokenSelectorUsage';
 import { ChainSelectorUsage } from '@/components/ChainSelectorUsage';
 import { useState } from 'react';
 import { TokenSelectorUsage } from '@/components/TokenSelectorUsage';
+import { ChainId } from '@decent.xyz/box-common';
 
 export default function ExamplePage() {
   const [chainId, setChainId] = useState<ChainId>(ChainId.ARBITRUM);

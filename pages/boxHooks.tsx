@@ -4,11 +4,6 @@ import {
   BoxHooksContextProvider,
   useBoxAction,
   UseBoxActionArgs,
-  EvmTransaction,
-  ActionType,
-  bigintSerializer,
-  ChainId,
-  getChainExplorerTxLink,
   useBridgeReceipt,
 } from '@decent.xyz/box-hooks';
 
@@ -27,6 +22,13 @@ import {
   waitForTransaction,
 } from '@wagmi/core';
 import { Button, CodeBlock, H1, H2, P } from '@/components/common';
+import {
+  ActionType,
+  bigintSerializer,
+  ChainId,
+  EvmTransaction,
+  getChainExplorerTxLink,
+} from '@decent.xyz/box-common';
 
 export const prettyPrint = (obj: any) =>
   JSON.stringify(obj, bigintSerializer, 2);
