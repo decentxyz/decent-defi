@@ -6,6 +6,7 @@ export default function BoxSplashPage() {
     { title: 'The Box', link: '/theBox' },
     { title: 'Box Hooks', link: '/boxHooks' },
     { title: 'Box UI', link: '/boxUi' },
+    { title: 'Fiat Checkout', link: '/fiat-checkout' },
   ];
   return (
     <Layout>

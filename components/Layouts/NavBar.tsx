@@ -2,18 +2,20 @@ import clsx from 'clsx';
 import { ConnectButton as RainbowConnectButton } from '@rainbow-me/rainbowkit';
 import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export const NavBar = () => {
   return (
     <nav>
-      <div className="absolute m-8 top-0 left-0 flex gap-8 items-center">
-        <Image
-          src="/decent-icon-black.png"
-          alt="Decent Logo"
-          height={40}
-          width={48}
-        />
-        <p className="uppercase mx-auto text-3xl font-light">Click. Transact.</p>
+      <div className="absolute m-8 top-0 left-0 flex gap-8 items-center z-20">
+        <Link href='/'>
+          <Image
+            src="/decent-icon-black.png"
+            alt="Decent Logo"
+            height={40}
+            width={48}
+          />
+        </Link>
       </div>
       <div
         className={clsx(

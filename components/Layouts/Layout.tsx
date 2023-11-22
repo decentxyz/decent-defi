@@ -16,16 +16,6 @@ export const Layout = ({ children }: PropsWithChildren) => {
           )}
         >
           <div>{children}</div>
-          <h1
-            className={clsx(
-              'flex items-center justify-center',
-              'uppercase font-semibold tracking-widest',
-              'text-5xl sm:text-7xl md:text-8xl lg:text-8xl pt-10 mb-0',
-              styles.titleGrow
-            )}
-          >
-            The&nbsp;Box
-          </h1>
         </div>
       </div>
     </div>
