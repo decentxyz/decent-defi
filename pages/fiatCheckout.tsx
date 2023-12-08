@@ -28,7 +28,7 @@ export default function ExamplePage() {
           to your site.
         </P>
         <div className="py-8">
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap gap-4">
             <a
               href="https://checkout.decent.xyz/"
               target="_blank"
@@ -41,7 +41,7 @@ export default function ExamplePage() {
             </CodeBlock>
           </div>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap gap-4">
             <a
               href={
                 connectedAddress &&
@@ -57,7 +57,7 @@ export default function ExamplePage() {
             </CodeBlock>
           </div>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap gap-4">
             <a
               href={
                 connectedAddress &&
@@ -73,7 +73,7 @@ export default function ExamplePage() {
             </CodeBlock>
           </div>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap gap-4">
             <a
               href={`https://checkout.decent.xyz?wallet=${connectedAddress}&chain=${ChainId.OPTIMISM}&app=nft&nft=${EARLY_OPTIMISTS}%3A${EARLY_OPTIMISTS_ID}&redir=${REDIRECT_URL}`}
               target="_blank"
@@ -86,13 +86,13 @@ export default function ExamplePage() {
             </CodeBlock>
           </div>
 
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap gap-4">
             <a
               href={`https://checkout.decent.xyz?wallet=${connectedAddress}&chain=${ChainId.ARBITRUM}&token=${ARB_MAGIC}&app=bridge`}
               target="_blank"
               className="px-4 py-2 rounded-md text-white bg-black"
             >
-              {connectedAddress ? "Bridge Arbitrum" : "Connect Wallet"}
+              {connectedAddress ? "Get MAGIC on Arbitrum" : "Connect Wallet"}
             </a>
             <CodeBlock className="max-w-[740px]">
               {`<a href='https://checkout.decent.xyz?wallet=${connectedAddress}&chain=${ChainId.ARBITRUM}&token=${ARB_MAGIC}&app=bridge'>Bridge to MAGIC on Arbitrum</a>`}
