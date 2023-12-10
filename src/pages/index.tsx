@@ -1,4 +1,4 @@
-import SwapModal from "@/src/components/SwapModal";
+import SwapModal from "../components/SwapModal";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
 import Image from "next/image";

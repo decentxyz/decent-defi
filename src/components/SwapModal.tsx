@@ -1,46 +1,31 @@
-import { useState, useContext, useEffect, Fragment } from "react";
-import { TokenSelectorComponent } from "./TokenSelectorComponent";
-import ChainSelectMenu from "./ChainSelectorMenu";
-import useDebounced from "@/src/lib/useDebounced";
-import { ChainId, TokenInfo, ethGasToken } from "@decent.xyz/box-common";
-import { RouteSelectContext, getDefaultToken } from "@/src/lib/contexts/routeSelectContext";
-import { useAmtOutQuote, useAmtInQuote } from "@/src/lib/hooks/useReturnQuotes";
-import { roundValue } from "@/src/lib/roundValue";
-import { useBalance } from "@/src/lib/hooks/useBalance";
-import { BoxActionContext } from '@/src/lib/contexts/decentActionContext';
+import { TokenSelectorComponent } from './TokenSelectorComponent';
+import ChainSelectMenu from '../components/ChainSelectorMenu';
+import { useContext, useEffect, useState, Fragment } from 'react';
+import { RouteSelectContext, getDefaultToken } from '../lib/contexts/routeSelectContext';
+import { ChainId, ethGasToken, TokenInfo } from '@decent.xyz/box-common';
+import useDebounced from '../lib/useDebounced';
+import { useDecentAmountInQuote, useDecentAmountOutQuote } from '../lib/hooks/useDecentQuotes';
+import { formatUnits } from 'viem';
+import { BoxActionContext } from '../lib/contexts/decentActionContext';
 import {
   generateDecentAmountInParams,
   generateDecentAmountOutParams,
 } from '../lib/generateDecentParams';
-import { useAccount, usePublicClient } from "wagmi";
+import { roundValue } from '../lib/roundValue';
+import { useAccount, useNetwork, usePublicClient, useSwitchNetwork } from 'wagmi';
+import { formatFees } from '../lib/formatFees';
+import { useBalance } from '../lib/hooks/useBalance';
 
-export default function SwapModal(){
-  const { address: account } = useAccount();
+export default function SwapModal() {
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
-  
-  const [srcInputVal, setSrcInputVal] = useState<string | null>('');
-  const [dstInputVal, setDstInputVal] = useState<string | null>('');
+  const { address: account } = useAccount();
+  const { switchNetwork } = useSwitchNetwork();
 
-  const [srcInputDebounced, overrideDebouncedSrc] = useDebounced(srcInputVal);
-  const [dstInputDebounced, overrideDebouncedDst] = useDebounced(dstInputVal);
-  
-  const { setBoxActionArgs } = useContext(BoxActionContext);
   const { dstChain, dstToken } = routeVars;
   const srcToken = routeVars.srcToken;
   const srcChain = routeVars.srcChain;
-
-  const publicClient = usePublicClient({ chainId: srcChain });
-
-  const [hasGasFunds, setHasGasFunds] = useState<boolean>(true);
-  const [submitting, setSubmitting] = useState(false);
-
-
-  const {
-    nativeBalance: srcNativeBalance,
-    tokenBalance: srcTokenBalance,
-  } = useBalance(account, srcToken);
-  const srcTokenBalanceRounded = roundValue(srcTokenBalance, 2) ?? 0;
-
+  console.log("HEREE", routeVars)
+  
   const setSrcChain = (c: ChainId) => updateRouteVars({ srcChain: c });
   const setSrcToken = (t: TokenInfo) => updateRouteVars({ srcToken: t });
   useEffect(() => {
@@ -49,6 +34,50 @@ export default function SwapModal(){
       srcToken: ethGasToken,
     });
   }, []);
+  const { chain } = useNetwork();
+  const publicClient = usePublicClient({ chainId: srcChain });
+  const [hasGasFunds, setHasGasFunds] = useState<boolean>(true);
+
+  const {
+    nativeBalance: srcNativeBalance,
+    tokenBalance: srcTokenBalance,
+  } = useBalance(account, srcToken);
+  const srcTokenBalanceRounded = roundValue(srcTokenBalance, 2) ?? 0;
+
+  const [submitting, setSubmitting] = useState(false);
+  const [submitErrorText, setSubmitErrorText] = useState('');
+
+  const { setBoxActionArgs } = useContext(BoxActionContext);
+
+  const handleSrcAmtChange = (strVal: string) => {
+    if (strVal == '') {
+      setSrcInputVal('');
+      return;
+    }
+
+    if (!/^\d*\.?\d*$/.test(strVal)) return;
+    setSrcInputVal(strVal);
+    setDstInputVal(null);
+    overrideDebouncedDst(null);
+    setSubmitErrorText('');
+  };
+
+  const handleDstAmtChange = (strVal: string) => {
+    if (!/^\d*\.?\d*$/.test(strVal)) return;
+    setDstInputVal(strVal);
+    setSrcInputVal(null);
+    overrideDebouncedSrc(null);
+    // setSubmitErrorText('');
+  };
+
+  const [srcInputVal, setSrcInputVal] = useState<string | null>(null);
+  const [dstInputVal, setDstInputVal] = useState<string | null>(null);
+
+  const [srcInputDebounced, overrideDebouncedSrc] = useDebounced(srcInputVal);
+  const [dstInputDebounced, overrideDebouncedDst] = useDebounced(dstInputVal);
+
+  const srcDebounceWaiting = srcInputDebounced != srcInputVal;
+  const dstDebounceWaiting = dstInputDebounced != dstInputVal;
 
   const {
     isLoading: amtOutLoading,
@@ -67,11 +96,17 @@ export default function SwapModal(){
   } = useAmtInQuote(srcInputDebounced, dstToken, srcToken, srcChain);
 
   useEffect(() => {
+    if (chain?.id !== srcChain) {
+      switchNetwork?.(srcChain)
+    };
+  }, [srcChain]);
+
+  useEffect(() => {
     const simulateGas = async (tx: any) => {
       try {
         setHasGasFunds(true);
         const gas = await publicClient.estimateGas({
-          account: account,
+          account,
           ...tx,
         });
       } catch (e: any) {
@@ -90,46 +125,36 @@ export default function SwapModal(){
 
     runEstimates();
   }, [srcInputDebounced, dstInputDebounced, amtInTx, amtOutTx]);
-  
+
   const srcDisplay = srcCalcedVal ?? srcInputVal ?? '';
   const dstDisplay = dstCalcedVal ?? dstInputVal ?? '';
 
-  const [submitErrorText, setSubmitErrorText] = useState('');
-
-  const handleSrcAmtChange = (strVal: string) => {
-    if (strVal == '') {
-      setSrcInputVal('');
-      return;
+  useEffect(() => {
+    const srcNum = Number(srcDisplay);
+    if (srcNum > srcTokenBalance) {
+      setSubmitErrorText(
+        'Insufficient funds. Try onramping to fill your wallet.'
+      );
+    } else if ( srcNum < srcTokenBalance && !hasGasFunds ) {
+      setSubmitErrorText(
+        'Insufficient funds for gas. Try onramping to fill your wallet.'
+      );
+    } else {
+      setSubmitErrorText('');
     }
-
-    if (!/^\d*\.?\d*$/.test(strVal)) return;
-    setSrcInputVal(strVal);
-    setDstInputVal('');
-    overrideDebouncedDst(null);
-    setSubmitErrorText('');
-  };
-
-  const handleDstAmtChange = (strVal: string) => {
-    if (!/^\d*\.?\d*$/.test(strVal)) return;
-    setDstInputVal(strVal);
-    setSrcInputVal(null);
-    overrideDebouncedSrc(null);
-  };
-
-  const srcDebounceWaiting = srcInputDebounced != srcInputVal;
-  const dstDebounceWaiting = dstInputDebounced != dstInputVal;
+  }, [srcTokenBalance, srcDisplay]);
 
   const srcSpinning = amtOutLoading || dstDebounceWaiting;
   const dstSpinning = amtInLoading || srcDebounceWaiting;
 
   const continueDisabled =
-  !!submitErrorText ||
-  !!amtOutErrorText ||
-  !!amtInErrorText ||
-  srcSpinning ||
-  dstSpinning ||
-  !(Number(srcInputDebounced) || Number(dstInputDebounced)) ||
-  submitting;
+    !!submitErrorText ||
+    !!amtOutErrorText ||
+    !!amtInErrorText ||
+    srcSpinning ||
+    dstSpinning ||
+    !(Number(srcInputDebounced) || Number(dstInputDebounced)) ||
+    submitting;
 
   const onConfirmClick = () => {
     if (continueDisabled) return;
@@ -164,99 +189,99 @@ export default function SwapModal(){
   };
 
   return (
-    <div className="group mt-8 bg-white">
-      <div
-      className={
-        'p-4 rounded-t border' +
-        ' focus-within:border-accent-purple' +
-        ' group-focus-within:border-b-accent-purple'
-      }
-    >
-      <div className="text-sm">
-        <span className="inline-block w-16">Pay </span>
-        <TokenSelectorComponent
-          disabled={false}
-          currentChain={srcChain}
-          selectedToken={srcToken}
-          setSelectedToken={(t) => {
-            setSrcToken(t);
-          }}
-          wallet={account}
-        />{' '}
-        on{' '}
-        <ChainSelectMenu
-          chainId={srcChain}
-          onSelectChain={(c) => {
-            setSrcChain(c);
-            const t = getDefaultToken(c);
-            setSrcToken(t);
-          }}
-        />
-      </div>
+    <>
+      <div className="group mt-8 bg-white">
+        <div
+          className={
+            'p-4 rounded-t border' +
+            ' focus-within:border-accent-purple' +
+            ' group-focus-within:border-b-accent-purple'
+          }
+        >
+          <div className="text-sm">
+            <span className="inline-block w-16">Pay </span>
+            <TokenSelectorComponent
+              disabled={false}
+              currentChain={srcChain}
+              selectedToken={srcToken}
+              setSelectedToken={(t) => {
+                setSrcToken(t);
+              }}
+              wallet={account}
+            />{' '}
+            on{' '}
+            <ChainSelectMenu
+              chainId={srcChain}
+              onSelectChain={(c) => {
+                setSrcChain(c);
+                const t = getDefaultToken(c);
+                setSrcToken(t);
+              }}
+            />
+          </div>
 
-      <div className="my-4 px-2 font-medium leading-none relative text-3xl flex items-center">
-        {srcSpinning && (
-          <div className="absolute inset-0 rounded load-shine opacity-75" />
-        )}
-        <input
-          className="w-full focus:outline-none rounded-sm"
-          type="text"
-          value={srcDisplay}
-          onChange={(e) => handleSrcAmtChange(e.target.value)}
-          disabled={srcSpinning || submitting}
-        />
-        <div className="absolute right-4 text-gray-mid-light pointer-events-none">
-          {srcToken.symbol}
+          <div className="my-4 px-2 font-medium leading-none relative text-3xl flex items-center">
+            {srcSpinning && (
+              <div className="absolute inset-0 rounded load-shine opacity-75" />
+            )}
+            <input
+              className="w-full focus:outline-none"
+              type="text"
+              value={srcDisplay}
+              onChange={(e) => handleSrcAmtChange(e.target.value)}
+              disabled={srcSpinning || submitting}
+            />
+            <div className="absolute right-4 text-gray-mid-light pointer-events-none">
+              {srcToken.symbol}
+            </div>
+            <div className="absolute right-4 top-full text-xs text-gray-mid">
+              Balance: {srcTokenBalanceRounded}
+            </div>
+          </div>
         </div>
-        <div className="absolute top-full right-4 text-xs text-gray-mid">
-          Balance: {srcTokenBalanceRounded}
-        </div>
-      </div>
-    </div>
-
-    <div
-    className={
-      'border border-t-0 p-4 rounded-b' +
-      ' focus-within:border-accent-purple'
-    }
-    >
-      <div className="text-sm">
-        <span className="inline-block w-16">Receive </span>
-        <TokenSelectorComponent
-          disabled={false}
-          currentChain={dstChain}
-          selectedToken={dstToken}
-          setSelectedToken={(t) => {
-            updateRouteVars({ dstToken: t });
-          }}
-          wallet={account}
-        />{' '}
-        on{' '}
-        <ChainSelectMenu
-          chainId={dstChain}
-          onSelectChain={(c) => {
-            updateRouteVars({ dstChain: c });
-          }}
-        />
-        <div className="my-4 px-2 font-medium leading-none relative text-3xl flex items-center">
-          {dstSpinning && (
-            <div className="absolute inset-0 rounded load-shine opacity-75" />
-          )}
-          <input
-            className="w-full focus:outline-none"
-            type="text"
-            value={dstDisplay}
-            onChange={(e) => handleDstAmtChange(e.target.value)}
-            disabled={dstSpinning || submitting}
-          />
-          <div className="absolute right-4 text-gray-mid-light pointer-events-none">
-            {dstToken.symbol}
+        <div
+          className={
+            'border border-t-0 p-4 rounded-b' +
+            ' focus-within:border-accent-purple'
+          }
+        >
+          <div className="text-sm">
+            <span className="inline-block w-16">Receive </span>
+            <TokenSelectorComponent
+              disabled={false}
+              currentChain={dstChain}
+              selectedToken={dstToken}
+              setSelectedToken={(t) => {
+                updateRouteVars({ dstToken: t });
+              }}
+              wallet={account}
+            />{' '}
+            on{' '}
+            <ChainSelectMenu
+              chainId={dstChain}
+              onSelectChain={(c) => {
+                updateRouteVars({ dstChain: c });
+              }}
+            />
+            <div className="my-4 px-2 font-medium leading-none relative text-3xl flex items-center">
+              {dstSpinning && (
+                <div className="absolute inset-0 rounded load-shine opacity-75" />
+              )}
+              <input
+                className="w-full focus:outline-none"
+                type="text"
+                value={dstDisplay}
+                onChange={(e) => handleDstAmtChange(e.target.value)}
+                disabled={dstSpinning || submitting}
+              />
+              <div className="absolute right-4 text-gray-mid-light pointer-events-none">
+                {dstToken.symbol}
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-    <div className="grid grid-cols-2 gap-x-2 gap-y-1 py-4 px-2 text-sm">
+      <div className="grid grid-cols-2 gap-x-2 gap-y-1 py-4 px-2 text-sm">
         {srcInputDebounced && amtInFees &&
           Object.keys(amtInFees).map((feeName) => (
             <Fragment key={feeName}>
@@ -272,24 +297,89 @@ export default function SwapModal(){
               <div className="text-right">{amtOutFees[feeName]}</div>
             </Fragment>
           ))}
-          {!hasGasFunds && <p className="text-red">Insufficient Funds</p>}
       </div>
+      <div className="mt-auto"></div>
 
       <button
         className={
-          `${!srcInputVal && !dstInputVal ? 'bg-gray-200 text-gray-500 ' : 'bg-black text-white '}` +
-          'text-center font-medium' +
+          'bg-black text-white text-center font-medium' +
           ' w-full rounded-lg p-2 mt-4' +
           ' relative flex items-center justify-center'
         }
         onClick={onConfirmClick}
-        disabled={!srcInputVal && !dstInputVal || !account && !hasGasFunds}
+        disabled={continueDisabled}
       >
-        Swap
+        Confirm
         {submitting && (
           <div className="absolute right-4 load-spinner"></div>
         )}
       </button>
-    </div>
-  )
+    </>
+  );
+}
+
+function useAmtInQuote(
+  srcInput: string | null,
+  destToken: TokenInfo,
+  srcToken: TokenInfo,
+  srcChain: ChainId
+) {
+  const { actionResponse, isLoading, error } = useDecentAmountInQuote(
+    destToken,
+    srcInput ?? undefined,
+    srcToken
+  );
+
+  const appFee = actionResponse?.applicationFee?.amount || 0n;
+  const bridgeFee = actionResponse?.bridgeFee?.amount || 0n;
+  const fees = formatFees(appFee, bridgeFee, srcChain);
+  const tx = actionResponse?.tx;
+  const amountOut = actionResponse?.amountOut?.amount || undefined;
+
+  const dstCalcedVal = amountOut
+    ? parseFloat(formatUnits(amountOut, destToken.decimals)).toPrecision(8)
+    : undefined;
+
+  return {
+    isLoading,
+    dstCalcedVal,
+    fees,
+    tx,
+    errorText: error
+      ? 'Could not find routes. Try a different token pair.'
+      : '',
+  };
+}
+
+function useAmtOutQuote(
+  dstInput: string | null,
+  destToken: TokenInfo,
+  srcToken: TokenInfo,
+  srcChain: ChainId
+) {
+  const { actionResponse, isLoading, error } = useDecentAmountOutQuote(
+    destToken,
+    dstInput ?? undefined,
+    srcToken
+  );
+
+  const appFee = actionResponse?.applicationFee?.amount || 0n;
+  const bridgeFee = actionResponse?.bridgeFee?.amount || 0n;
+  const fees = formatFees(appFee, bridgeFee, srcChain);
+  const tx = actionResponse?.tx;
+  const amountIn = actionResponse?.tokenPayment?.amount || undefined;
+
+  const srcCalcedVal = amountIn
+    ? parseFloat(formatUnits(amountIn, srcToken.decimals)).toPrecision(8)
+    : undefined;
+
+  return {
+    isLoading,
+    srcCalcedVal,
+    fees,
+    tx,
+    errorText: error
+      ? 'Could not find routes. Try a different token pair.'
+      : '',
+  };
 }
