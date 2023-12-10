@@ -1,16 +1,16 @@
 import { TokenInfo, ChainId } from "@decent.xyz/box-common";
-import { useBoxAmountOutQuote, useBoxAmountInQuote } from "./useDecentQuotes";
+import { useDecentAmountOutQuote, useDecentAmountInQuote } from "./useDecentQuotes";
 import { formatFees } from "../formatFees";
 import { formatUnits } from "viem";
 
 export function useAmtOutQuote(
   dstInput: string | null,
-  destToken: TokenInfo,
+  dstToken: TokenInfo,
   srcToken: TokenInfo,
   srcChain: ChainId
 ) {
-  const { actionResponse, isLoading, error } = useBoxAmountOutQuote(
-    destToken,
+  const { actionResponse, isLoading, error } = useDecentAmountOutQuote(
+    dstToken,
     dstInput ?? undefined,
     srcToken
   );
@@ -38,12 +38,12 @@ export function useAmtOutQuote(
 
 export function useAmtInQuote(
   srcInput: string | null,
-  destToken: TokenInfo,
+  dstToken: TokenInfo,
   srcToken: TokenInfo,
   srcChain: ChainId
 ) {
-  const { actionResponse, isLoading, error } = useBoxAmountInQuote(
-    destToken,
+  const { actionResponse, isLoading, error } = useDecentAmountInQuote(
+    dstToken,
     srcInput ?? undefined,
     srcToken
   );
@@ -55,7 +55,7 @@ export function useAmtInQuote(
   const amountOut = actionResponse?.amountOut?.amount || undefined;
 
   const dstCalcedVal = amountOut
-    ? parseFloat(formatUnits(amountOut, destToken.decimals)).toPrecision(8)
+    ? parseFloat(formatUnits(amountOut, dstToken.decimals)).toPrecision(8)
     : undefined;
 
   return {

@@ -2,7 +2,7 @@ import { Fragment, useEffect } from 'react';
 import Image from 'next/image';
 import { Popover, Transition } from '@headlessui/react';
 import { ChainId } from '@decent.xyz/box-common';
-import { chainIcons, chainNames } from '@/lib/routeSelectContext';
+import { chainIcons, chainNames } from '@/src/lib/contexts/routeSelectContext';
 import { useSearchParams } from 'next/navigation';
 
 const defaultAvailableChains = [

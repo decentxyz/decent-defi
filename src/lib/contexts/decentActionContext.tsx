@@ -1,7 +1,6 @@
 import { useBoxAction, UseBoxActionArgs } from '@decent.xyz/box-hooks';
 import {
   PropsWithChildren,
-  ReactNode,
   createContext,
   useState,
 } from 'react';
@@ -26,7 +25,7 @@ export const BoxActionContext = createContext<BoxActionContextProps>({
 
 export const BoxActionContextProvider = ({
   children,
-}: PropsWithChildren<ReactNode>) => {
+}: PropsWithChildren) => {
   const [boxActionArgs, setBoxActionArgs] = useState<UseBoxActionArgs>();
   const boxActionResponse = useBoxAction(boxActionArgs);
 

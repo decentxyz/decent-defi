@@ -1,18 +1,18 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, Fragment } from "react";
 import { TokenSelectorComponent } from "./TokenSelectorComponent";
 import ChainSelectMenu from "./ChainSelectorMenu";
-import useDebounced from "@/lib/useDebounced";
+import useDebounced from "@/src/lib/useDebounced";
 import { ChainId, TokenInfo, ethGasToken } from "@decent.xyz/box-common";
-import { RouteSelectContext, getDefaultToken } from "@/lib/routeSelectContext";
-import { useAmtOutQuote, useAmtInQuote } from "@/lib/hooks/useReturnQuotes";
-import { roundValue } from "@/lib/roundValue";
-import { useBalance } from "@/lib/hooks/useBalance";
-import { BoxActionContext } from '@/boxActionContext';
+import { RouteSelectContext, getDefaultToken } from "@/src/lib/contexts/routeSelectContext";
+import { useAmtOutQuote, useAmtInQuote } from "@/src/lib/hooks/useReturnQuotes";
+import { roundValue } from "@/src/lib/roundValue";
+import { useBalance } from "@/src/lib/hooks/useBalance";
+import { BoxActionContext } from '@/src/lib/contexts/decentActionContext';
 import {
-  generateBoxAmountInParams,
-  generateBoxAmountOutParams,
+  generateDecentAmountInParams,
+  generateDecentAmountOutParams,
 } from '../lib/generateDecentParams';
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 
 export default function SwapModal(){
   const { address: account } = useAccount();
@@ -20,15 +20,20 @@ export default function SwapModal(){
   
   const [srcInputVal, setSrcInputVal] = useState<string | null>('');
   const [dstInputVal, setDstInputVal] = useState<string | null>('');
+
   const [srcInputDebounced, overrideDebouncedSrc] = useDebounced(srcInputVal);
   const [dstInputDebounced, overrideDebouncedDst] = useDebounced(dstInputVal);
+  
   const { setBoxActionArgs } = useContext(BoxActionContext);
-
-  const [submitting, setSubmitting] = useState(false);
-
   const { dstChain, dstToken } = routeVars;
   const srcToken = routeVars.srcToken;
   const srcChain = routeVars.srcChain;
+
+  const publicClient = usePublicClient({ chainId: srcChain });
+
+  const [hasGasFunds, setHasGasFunds] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState(false);
+
 
   const {
     nativeBalance: srcNativeBalance,
@@ -60,13 +65,34 @@ export default function SwapModal(){
     tx: amtInTx,
     dstCalcedVal,
   } = useAmtInQuote(srcInputDebounced, dstToken, srcToken, srcChain);
+
+  useEffect(() => {
+    const simulateGas = async (tx: any) => {
+      try {
+        setHasGasFunds(true);
+        const gas = await publicClient.estimateGas({
+          account: account,
+          ...tx,
+        });
+      } catch (e: any) {
+        e?.shortMessage?.includes('exceeds the balance')
+          && setHasGasFunds(false);
+      }
+    }
+
+    const runEstimates = async () => {
+      if ( srcInputDebounced && amtInTx ) {
+        simulateGas(amtInTx);
+      } else if ( dstInputDebounced && amtOutTx ) {
+        simulateGas(amtOutTx);
+      }
+    }
+
+    runEstimates();
+  }, [srcInputDebounced, dstInputDebounced, amtInTx, amtOutTx]);
   
   const srcDisplay = srcCalcedVal ?? srcInputVal ?? '';
   const dstDisplay = dstCalcedVal ?? dstInputVal ?? '';
-
-  updateRouteVars({
-    purchaseName: `${Number(srcDisplay).toPrecision(2)} ${dstToken.symbol}`,
-  });
 
   const [submitErrorText, setSubmitErrorText] = useState('');
 
@@ -114,7 +140,7 @@ export default function SwapModal(){
       purchaseName: `${Number(srcDisplay).toPrecision(2)} ${dstToken.symbol}`,
     });
     if (srcInputDebounced) {
-      const actionArgs = generateBoxAmountInParams({
+      const actionArgs = generateDecentAmountInParams({
         srcToken,
         dstToken: dstToken,
         srcAmount: srcInputDebounced,
@@ -123,7 +149,7 @@ export default function SwapModal(){
       });
       setBoxActionArgs(actionArgs);
     } else if (dstInputDebounced) {
-      const actionArgs = generateBoxAmountOutParams({
+      const actionArgs = generateDecentAmountOutParams({
         srcToken,
         dstToken: dstToken,
         dstAmount: dstInputDebounced,
@@ -163,7 +189,7 @@ export default function SwapModal(){
           onSelectChain={(c) => {
             setSrcChain(c);
             const t = getDefaultToken(c);
-            setSrcToken(t);;
+            setSrcToken(t);
           }}
         />
       </div>
@@ -230,21 +256,40 @@ export default function SwapModal(){
       </div>
     </div>
 
-    <button
-      className={
-        `${!srcInputVal && !dstInputVal ? 'bg-gray-200 text-gray-500 ' : 'bg-black text-white '}` +
-        'text-center font-medium' +
-        ' w-full rounded-lg p-2 mt-4' +
-        ' relative flex items-center justify-center'
-      }
-      onClick={onConfirmClick}
-      disabled={!srcInputVal && !dstInputVal || !account}
-    >
-      Swap
-      {submitting && (
-        <div className="absolute right-4 load-spinner"></div>
-      )}
-    </button>
-  </div>
+    <div className="grid grid-cols-2 gap-x-2 gap-y-1 py-4 px-2 text-sm">
+        {srcInputDebounced && amtInFees &&
+          Object.keys(amtInFees).map((feeName) => (
+            <Fragment key={feeName}>
+              <div>{feeName}</div>
+              <div className="text-right">{amtInFees[feeName]}</div>
+            </Fragment>
+          ))}
+
+        {dstInputDebounced && amtOutFees &&
+          Object.keys(amtOutFees).map((feeName) => (
+            <Fragment key={feeName}>
+              <div>{feeName}</div>
+              <div className="text-right">{amtOutFees[feeName]}</div>
+            </Fragment>
+          ))}
+          {!hasGasFunds && <p className="text-red">Insufficient Funds</p>}
+      </div>
+
+      <button
+        className={
+          `${!srcInputVal && !dstInputVal ? 'bg-gray-200 text-gray-500 ' : 'bg-black text-white '}` +
+          'text-center font-medium' +
+          ' w-full rounded-lg p-2 mt-4' +
+          ' relative flex items-center justify-center'
+        }
+        onClick={onConfirmClick}
+        disabled={!srcInputVal && !dstInputVal || !account && !hasGasFunds}
+      >
+        Swap
+        {submitting && (
+          <div className="absolute right-4 load-spinner"></div>
+        )}
+      </button>
+    </div>
   )
 }

@@ -1,5 +1,5 @@
 import { ChainId, TokenInfo, ethGasToken } from '@decent.xyz/box-common';
-import { polygonGasToken, usdcToken } from './constants';
+import { polygonGasToken, usdcToken } from '../constants';
 import { Dispatch, PropsWithChildren, createContext, useReducer } from 'react';
 
 export const chainIcons: { [key: number]: string } = {
@@ -67,8 +67,8 @@ export function getDefaultToken(chainId: ChainId) {
 
 export default function RouteSelectProvider({ children }: PropsWithChildren) {
   const [routeVars, updateRouteVars] = useReducer(routeReducer, {
-    srcChain: ChainId.OPTIMISM,
-    srcToken: usdcToken,
+    srcChain: ChainId.ARBITRUM,
+    srcToken: ethGasToken,
     dstChain: ChainId.OPTIMISM,
     dstToken: usdcToken,
     sameChain: false,

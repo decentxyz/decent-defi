@@ -1,9 +1,9 @@
-import { ActionType, ChainId, TokenInfo } from '@decent.xyz/box-common';
+import { ActionType, TokenInfo } from '@decent.xyz/box-common';
 import { UseBoxActionArgs } from '@decent.xyz/box-hooks';
-import { parseUnits, zeroAddress } from 'viem';
-import { usdcToken, USDC_OPTIMISM } from './constants';
+import { parseUnits } from 'viem';
+import { usdcToken } from './constants';
 
-export const generateBoxAmountInParams = ({
+export const generateDecentAmountInParams = ({
   dstToken,
   srcAmount,
   srcToken = usdcToken,
@@ -45,7 +45,7 @@ export const generateBoxAmountInParams = ({
   };
 };
 
-export const generateBoxAmountOutParams = ({
+export const generateDecentAmountOutParams = ({
   dstToken,
   dstAmount,
   srcToken = usdcToken,
@@ -76,52 +76,6 @@ export const generateBoxAmountOutParams = ({
     slippage: 1, // 1%
     dstChainId: dstToken.chainId,
     sender: connectedAddress,
-  };
-};
-
-export type NftDetails = {
-  dstChain: ChainId;
-  dstToken: string;
-  address: string;
-  tokenId: string;
-};
-
-export const generateSecondaryParams = (
-  connectedAddress?: string,
-  recipient?: string,
-  nftDetails?: NftDetails
-): UseBoxActionArgs | undefined => {
-  const nftAddress = nftDetails?.address;
-  const nftChainId = nftDetails?.dstChain;
-  const tokenId = nftDetails?.tokenId;
-  const nftPaymentAddress = nftDetails?.dstToken;
-
-  if (!connectedAddress) {
-    console.log('no privy address!');
-    return;
-  }
-  if (!recipient) {
-    console.log('no recipient!');
-    return;
-  }
-  if (!nftAddress || !nftChainId) {
-    console.log('no nft address w chainId inputted!');
-    return;
-  }
-  return {
-    actionType: ActionType.NftFillAsk,
-    actionConfig: {
-      contractAddress: nftAddress,
-      chainId: nftChainId,
-      recipient: recipient,
-      tokenId: tokenId,
-    },
-    srcChainId: ChainId.OPTIMISM,
-    srcToken: USDC_OPTIMISM,
-    slippage: 1,
-    sender: connectedAddress,
-    dstChainId: nftChainId,
-    dstToken: nftPaymentAddress || zeroAddress,
   };
 };
 

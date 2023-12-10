@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import Image from 'next/image';
 import clsx from 'clsx';
 import styles from '@/styles/splash-animation.module.css';
-import { Layout } from '@/components/Layouts/Layout';
+import { Layout } from '@/src/components/Layouts/Layout';
 
 type DefaultLayoutProps = {
   title?: string;

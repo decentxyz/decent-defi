@@ -3,12 +3,11 @@ import { ChainId, TokenInfo } from '@decent.xyz/box-common';
 import { formatUnits } from 'viem';
 import { usdcToken } from '../constants';
 import {
-  generateBoxAmountInParams,
-  generateBoxAmountOutParams,
+  generateDecentAmountInParams,
+  generateDecentAmountOutParams,
 } from '../generateDecentParams';
 
 type UseBoxActionReturn = ReturnType<typeof useBoxAction>;
-// TODO: can we import this from the-box?
 export type BoxActionResponse = UseBoxActionReturn['actionResponse'];
 
 const sampleAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
@@ -20,7 +19,7 @@ export type DecentQuote = {
   error?: Error;
 };
 
-export function useBoxAmountOutQuote(
+export function useDecentAmountOutQuote(
   dstToken: TokenInfo,
   dstAmount?: string,
   srcToken?: TokenInfo,
@@ -28,7 +27,7 @@ export function useBoxAmountOutQuote(
 ): DecentQuote {
   let boxArgs = undefined;
   try {
-    boxArgs = generateBoxAmountOutParams({
+    boxArgs = generateDecentAmountOutParams({
       dstToken,
       dstAmount,
       srcToken,
@@ -36,10 +35,10 @@ export function useBoxAmountOutQuote(
       toAddress: sampleAddress,
     });
   } catch (e) {
-    // console.log(e)
+    console.log(e)
   }
 
-  const quote = useBoxQuote(boxArgs);
+  const quote = useDecentQuote(boxArgs);
 
   const tokenPayment = quote?.actionResponse?.tokenPayment;
   const paymentAmt = !tokenPayment
@@ -49,14 +48,14 @@ export function useBoxAmountOutQuote(
   return { ...quote, paymentAmt };
 }
 
-export function useBoxAmountInQuote(
+export function useDecentAmountInQuote(
   dstToken: TokenInfo,
   srcAmount?: string,
   srcToken?: TokenInfo
 ): DecentQuote {
   let boxArgs = undefined;
   try {
-    boxArgs = generateBoxAmountInParams({
+    boxArgs = generateDecentAmountInParams({
       dstToken,
       srcAmount,
       srcToken,
@@ -64,9 +63,9 @@ export function useBoxAmountInQuote(
       toAddress: sampleAddress,
     });
   } catch (e) {
-    // console.log(e)
+    console.log(e)
   }
-  const quote = useBoxQuote(boxArgs);
+  const quote = useDecentQuote(boxArgs);
 
   const amountOut = quote?.actionResponse?.amountOut;
   const paymentAmt = !amountOut
@@ -76,7 +75,7 @@ export function useBoxAmountInQuote(
   return { ...quote, paymentAmt };
 }
 
-export const useBoxQuote = (boxActionArgs?: UseBoxActionArgs) => {
+export const useDecentQuote = (boxActionArgs?: UseBoxActionArgs) => {
   const { actionResponse, isLoading, error } = useBoxAction(
     // TODO: just pass boxActionArgs when useBoxAction can handle undefined
     boxActionArgs ?? ({ enable: false } as UseBoxActionArgs)

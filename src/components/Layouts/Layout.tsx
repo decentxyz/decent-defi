@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import { NavBar } from '@/components/Layouts/NavBar';
+import { NavBar } from '@/src/components/Layouts/NavBar';
 import clsx from 'clsx';
 import styles from '@/styles/splash-animation.module.css';
 
