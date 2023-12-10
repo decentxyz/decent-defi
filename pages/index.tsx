@@ -1,27 +1,34 @@
-import { Layout } from "@/components/Layouts/Layout";
+import SwapModal from "@/components/SwapModal";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import Link from "next/link";
+import Image from "next/image";
 
-export default function BoxSplashPage() {
-  const examples = [
-    { title: "The Box", link: "/theBox" },
-    { title: "Box Hooks", link: "/boxHooks" },
-    { title: "Box UI", link: "/boxUi" },
-    { title: "Fiat Checkout", link: "/fiatCheckout" },
-  ];
+export default function Index() {
+  
   return (
-    <Layout>
-      <h1 className={"font-semibold text-6xl mb-5"}>The Box Examples!</h1>
-      <p className={"mb-10 text-2xl"}>
-        Welcome to the-box examples project! Here you can find working-versions
-        of the-box.
-      </p>
-      <ul>
-        {examples.map(({ title, link }, i) => (
-          <li className={" mb-5 text-4xl text-gray-500 "} key={i}>
-            <Link href={link}>{title}</Link>
-          </li>
-        ))}
-      </ul>
-    </Layout>
-  );
+    <div className="px-8 bg-gray-100 min-h-screen relative">
+    <div className="flex justify-between py-4 items-center">
+      <a
+        href="https://checkout.decent.xyz/"
+        target="_blank"
+        className="py-2 px-4 bg-white rounded-md drop-shadow-md font-medium flex items-center gap-2"
+        >
+        <div>
+          <Image src='/decent-icon-black.png' height={20} width={20} alt='decent-icon'/>
+        </div>
+        Buy Crypto
+      </a>
+      <ConnectButton />
+    </div>
+      <div className="w-full flex justify-center mt-4">
+        <div className="sm:w-[480px]">
+          <SwapModal />
+        </div>
+      </div>
+      <div className="absolute bottom-4 flex w-full justify-center text-gray-500">
+        <span className="pr-1">Powered by</span>
+        <Link href='http://decent.xyz/' className="hover:opacity-80 hover:underline">Decent</Link>
+      </div>
+    </div>
+  )
 }
