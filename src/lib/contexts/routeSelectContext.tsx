@@ -34,7 +34,7 @@ export const RouteSelectContext = createContext<{
   updateRouteVars: Dispatch<Partial<RouteVars>>;
 }>({
   routeVars: {
-    srcChain: ChainId.ARBITRUM,
+    srcChain: ChainId.OPTIMISM,
     srcToken: ethGasToken,
     dstChain: ChainId.OPTIMISM,
     dstToken: usdcToken,

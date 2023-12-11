@@ -26,8 +26,12 @@ export const BoxActionContext = createContext<BoxActionContextProps>({
 export const BoxActionContextProvider = ({
   children,
 }: PropsWithChildren) => {
-  const [boxActionArgs, setBoxActionArgs] = useState<UseBoxActionArgs>();
-  const boxActionResponse = useBoxAction(boxActionArgs);
+  const [boxActionArgs, setBoxActionArgs] = useState<
+    UseBoxActionArgs | undefined
+  >();
+  const boxActionResponse = useBoxAction(
+    boxActionArgs ?? ({ enable: false } as UseBoxActionArgs)
+  );
 
   const value = {
     setBoxActionArgs,
@@ -41,3 +45,4 @@ export const BoxActionContextProvider = ({
     </BoxActionContext.Provider>
   );
 };
+

@@ -15,24 +15,11 @@ import { BoxHooksContextProvider } from '@decent.xyz/box-hooks';
 import { BoxActionContextProvider } from '../lib/contexts/decentActionContext';
 import RouteSelectProvider from '../lib/contexts/routeSelectContext';
 
-const getAlchemyProviders = () => {
-  const providers: ReturnType<typeof alchemyProvider>[] = [];
-  for (const c of ['OPTIMISM', 'ARBITRUM', 'POLYGON']) {
-    const apiKey = process.env[`${c}_MAINNET_KEY`];
-    if (apiKey) {
-      providers.push(alchemyProvider({ apiKey }));
-    }
-  }
-  return providers;
-};
-
 const { chains, publicClient } = configureChains(
-  [mainnet, arbitrum, optimism, polygon, base, avalanche],
+  [mainnet, polygon, optimism, arbitrum, base, avalanche],
   [
-    // @ts-ignore
-    ...getAlchemyProviders(),
-    // @ts-ignore
-    publicProvider(),
+    alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string }),
+    publicProvider()
   ]
 );
 const { connectors } = getDefaultWallets({
@@ -40,12 +27,11 @@ const { connectors } = getDefaultWallets({
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID as string,
   chains
 });
-
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors,
-  publicClient,
-});
+  publicClient
+})
 
 export const monument = localFont({
   src: '../fonts/EduMonumentGroteskVariable.woff2',

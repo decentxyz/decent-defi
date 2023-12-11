@@ -2,29 +2,40 @@ import { TokenSelectorComponent } from './TokenSelectorComponent';
 import ChainSelectMenu from '../components/ChainSelectorMenu';
 import { useContext, useEffect, useState, Fragment } from 'react';
 import { RouteSelectContext, getDefaultToken } from '../lib/contexts/routeSelectContext';
-import { ChainId, ethGasToken, TokenInfo } from '@decent.xyz/box-common';
+import { ChainId, ethGasToken, EvmTransaction, TokenInfo } from '@decent.xyz/box-common';
 import useDebounced from '../lib/useDebounced';
-import { useDecentAmountInQuote, useDecentAmountOutQuote } from '../lib/hooks/useDecentQuotes';
-import { formatUnits } from 'viem';
+import { useAmtInQuote, useAmtOutQuote } from '../lib/hooks/useSwapQuotes';
 import { BoxActionContext } from '../lib/contexts/decentActionContext';
 import {
   generateDecentAmountInParams,
   generateDecentAmountOutParams,
 } from '../lib/generateDecentParams';
 import { roundValue } from '../lib/roundValue';
-import { useAccount, useNetwork, usePublicClient, useSwitchNetwork } from 'wagmi';
-import { formatFees } from '../lib/formatFees';
+import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
+import { Hex, TransactionReceipt } from 'viem';
 import { useBalance } from '../lib/hooks/useBalance';
+import { sendTx } from '@/lib/sendTx';
+import { getAccount } from '@wagmi/core';
 
 export default function SwapModal() {
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
-  const { address: account } = useAccount();
-  const { switchNetwork } = useSwitchNetwork();
+  const {
+    setBoxActionArgs,
+    boxActionResponse: { actionResponse },
+  } = useContext(BoxActionContext);
+
+  const { chain } = useNetwork();
+  const { switchNetworkAsync } = useSwitchNetwork();
+  const { address: connectedAddress } = useAccount();
+  const account = getAccount();
+
+  const [showContinue, setShowContinue] = useState(true);
+  const [hash, setHash] = useState<Hex>();
+  const [srcTxReceipt, setSrcTxReceipt] = useState<TransactionReceipt>();
 
   const { dstChain, dstToken } = routeVars;
   const srcToken = routeVars.srcToken;
   const srcChain = routeVars.srcChain;
-  console.log("HEREE", routeVars)
   
   const setSrcChain = (c: ChainId) => updateRouteVars({ srcChain: c });
   const setSrcToken = (t: TokenInfo) => updateRouteVars({ srcToken: t });
@@ -34,20 +45,15 @@ export default function SwapModal() {
       srcToken: ethGasToken,
     });
   }, []);
-  const { chain } = useNetwork();
-  const publicClient = usePublicClient({ chainId: srcChain });
-  const [hasGasFunds, setHasGasFunds] = useState<boolean>(true);
 
   const {
     nativeBalance: srcNativeBalance,
     tokenBalance: srcTokenBalance,
-  } = useBalance(account, srcToken);
+  } = useBalance(connectedAddress, srcToken);
   const srcTokenBalanceRounded = roundValue(srcTokenBalance, 2) ?? 0;
 
   const [submitting, setSubmitting] = useState(false);
   const [submitErrorText, setSubmitErrorText] = useState('');
-
-  const { setBoxActionArgs } = useContext(BoxActionContext);
 
   const handleSrcAmtChange = (strVal: string) => {
     if (strVal == '') {
@@ -95,37 +101,6 @@ export default function SwapModal() {
     dstCalcedVal,
   } = useAmtInQuote(srcInputDebounced, dstToken, srcToken, srcChain);
 
-  useEffect(() => {
-    if (chain?.id !== srcChain) {
-      switchNetwork?.(srcChain)
-    };
-  }, [srcChain]);
-
-  useEffect(() => {
-    const simulateGas = async (tx: any) => {
-      try {
-        setHasGasFunds(true);
-        const gas = await publicClient.estimateGas({
-          account,
-          ...tx,
-        });
-      } catch (e: any) {
-        e?.shortMessage?.includes('exceeds the balance')
-          && setHasGasFunds(false);
-      }
-    }
-
-    const runEstimates = async () => {
-      if ( srcInputDebounced && amtInTx ) {
-        simulateGas(amtInTx);
-      } else if ( dstInputDebounced && amtOutTx ) {
-        simulateGas(amtOutTx);
-      }
-    }
-
-    runEstimates();
-  }, [srcInputDebounced, dstInputDebounced, amtInTx, amtOutTx]);
-
   const srcDisplay = srcCalcedVal ?? srcInputVal ?? '';
   const dstDisplay = dstCalcedVal ?? dstInputVal ?? '';
 
@@ -134,10 +109,6 @@ export default function SwapModal() {
     if (srcNum > srcTokenBalance) {
       setSubmitErrorText(
         'Insufficient funds. Try onramping to fill your wallet.'
-      );
-    } else if ( srcNum < srcTokenBalance && !hasGasFunds ) {
-      setSubmitErrorText(
-        'Insufficient funds for gas. Try onramping to fill your wallet.'
       );
     } else {
       setSubmitErrorText('');
@@ -156,11 +127,10 @@ export default function SwapModal() {
     !(Number(srcInputDebounced) || Number(dstInputDebounced)) ||
     submitting;
 
-  const onConfirmClick = () => {
-    if (continueDisabled) return;
+  const onContinueClick = () => {
+    if (continueDisabled || !chain) return;
     setSubmitting(true);
     setBoxActionArgs(undefined);
-    // reconstruct box args
     updateRouteVars({
       purchaseName: `${Number(srcDisplay).toPrecision(2)} ${dstToken.symbol}`,
     });
@@ -169,24 +139,48 @@ export default function SwapModal() {
         srcToken,
         dstToken: dstToken,
         srcAmount: srcInputDebounced,
-        connectedAddress: account,
-        toAddress: account,
+        connectedAddress,
+        toAddress: connectedAddress,
       });
       setBoxActionArgs(actionArgs);
+      setShowContinue(false);
     } else if (dstInputDebounced) {
       const actionArgs = generateDecentAmountOutParams({
         srcToken,
         dstToken: dstToken,
         dstAmount: dstInputDebounced,
-        connectedAddress: account,
-        toAddress: account,
+        connectedAddress,
+        toAddress: connectedAddress,
       });
       setBoxActionArgs(actionArgs);
+      setShowContinue(false);
     } else {
       setSubmitting(false);
       throw "Can't submit!";
     }
   };
+
+  const onConfirmClick = async () => {
+    console.log(
+      'Sending tx...',
+      actionResponse?.tx
+    );
+    try {
+      await sendTx({
+        account,
+        activeChainId: chain?.id!,
+        srcChainId: srcChain,
+        actionResponseTx: actionResponse?.tx as EvmTransaction,
+        setSrcTxReceipt,
+        setHash,
+        switchNetworkAsync
+      })
+      setSubmitting(true);
+    } catch (e) {
+      console.log('Error sending tx.', e);
+      setShowContinue(true);
+    }
+  }
 
   return (
     <>
@@ -206,8 +200,9 @@ export default function SwapModal() {
               selectedToken={srcToken}
               setSelectedToken={(t) => {
                 setSrcToken(t);
+                setShowContinue(true);
               }}
-              wallet={account}
+              wallet={connectedAddress}
             />{' '}
             on{' '}
             <ChainSelectMenu
@@ -216,6 +211,7 @@ export default function SwapModal() {
                 setSrcChain(c);
                 const t = getDefaultToken(c);
                 setSrcToken(t);
+                setShowContinue(true);
               }}
             />
           </div>
@@ -254,7 +250,7 @@ export default function SwapModal() {
               setSelectedToken={(t) => {
                 updateRouteVars({ dstToken: t });
               }}
-              wallet={account}
+              wallet={connectedAddress}
             />{' '}
             on{' '}
             <ChainSelectMenu
@@ -298,88 +294,41 @@ export default function SwapModal() {
             </Fragment>
           ))}
       </div>
+      <div className='text-red-500'>{submitErrorText}</div>
       <div className="mt-auto"></div>
-
+      {showContinue ? 
       <button
         className={
           'bg-black text-white text-center font-medium' +
           ' w-full rounded-lg p-2 mt-4' +
           ' relative flex items-center justify-center'
         }
-        onClick={onConfirmClick}
+        onClick={onContinueClick}
         disabled={continueDisabled}
       >
-        Confirm
+        Confirm Selections
+      </button>
+      :
+      <button
+        className={
+          'bg-primary text-white text-center font-medium' +
+          ' w-full rounded-lg p-2 mt-4' +
+          ' relative flex items-center justify-center'
+        }
+        onClick={onConfirmClick}
+      >
+        Swap
         {submitting && (
           <div className="absolute right-4 load-spinner"></div>
         )}
       </button>
+      }
+      {srcTxReceipt && 
+        <div>
+          <p>{hash}</p>
+          <p>{srcTxReceipt.blockHash}</p>
+        </div>
+      }
     </>
   );
-}
-
-function useAmtInQuote(
-  srcInput: string | null,
-  destToken: TokenInfo,
-  srcToken: TokenInfo,
-  srcChain: ChainId
-) {
-  const { actionResponse, isLoading, error } = useDecentAmountInQuote(
-    destToken,
-    srcInput ?? undefined,
-    srcToken
-  );
-
-  const appFee = actionResponse?.applicationFee?.amount || 0n;
-  const bridgeFee = actionResponse?.bridgeFee?.amount || 0n;
-  const fees = formatFees(appFee, bridgeFee, srcChain);
-  const tx = actionResponse?.tx;
-  const amountOut = actionResponse?.amountOut?.amount || undefined;
-
-  const dstCalcedVal = amountOut
-    ? parseFloat(formatUnits(amountOut, destToken.decimals)).toPrecision(8)
-    : undefined;
-
-  return {
-    isLoading,
-    dstCalcedVal,
-    fees,
-    tx,
-    errorText: error
-      ? 'Could not find routes. Try a different token pair.'
-      : '',
-  };
-}
-
-function useAmtOutQuote(
-  dstInput: string | null,
-  destToken: TokenInfo,
-  srcToken: TokenInfo,
-  srcChain: ChainId
-) {
-  const { actionResponse, isLoading, error } = useDecentAmountOutQuote(
-    destToken,
-    dstInput ?? undefined,
-    srcToken
-  );
-
-  const appFee = actionResponse?.applicationFee?.amount || 0n;
-  const bridgeFee = actionResponse?.bridgeFee?.amount || 0n;
-  const fees = formatFees(appFee, bridgeFee, srcChain);
-  const tx = actionResponse?.tx;
-  const amountIn = actionResponse?.tokenPayment?.amount || undefined;
-
-  const srcCalcedVal = amountIn
-    ? parseFloat(formatUnits(amountIn, srcToken.decimals)).toPrecision(8)
-    : undefined;
-
-  return {
-    isLoading,
-    srcCalcedVal,
-    fees,
-    tx,
-    errorText: error
-      ? 'Could not find routes. Try a different token pair.'
-      : '',
-  };
 }

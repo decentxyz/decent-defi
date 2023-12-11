@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 export default function Index() {
-  
+
   return (
     <div className="px-8 bg-gray-100 min-h-screen relative">
     <div className="flex justify-between py-4 items-center">

@@ -123,7 +123,7 @@ const makeNativeTransferConfig = (
   };
 };
 
-declare enum SwapDirection {
+enum SwapDirection {
   EXACT_AMOUNT_IN = 'exact-amount-in',
   EXACT_AMOUNT_OUT = 'exact-amount-out',
 }
