@@ -1,5 +1,5 @@
-import { TokenInfo } from '@decent.xyz/box-common';
-import { useUsersBalances } from '@decent.xyz/box-hooks';
+import { TokenInfo } from "@decent.xyz/box-common";
+import { useUsersBalances } from "@decent.xyz/box-hooks";
 
 export function useBalance(walletAddress?: string, token?: TokenInfo) {
   const enable = !!walletAddress && !!token;
@@ -10,15 +10,13 @@ export function useBalance(walletAddress?: string, token?: TokenInfo) {
     enable,
   });
   const tokenBalanceInfo = balances.tokens?.find(
-    (t) => t.address === token?.address
+    (t) => t.address === token?.address,
   );
 
-  const nativeBalanceInfo = balances.tokens?.find(
-    (t) => t.isNative
-  );
+  const nativeBalanceInfo = balances.tokens?.find((t) => t.isNative);
 
   return {
     tokenBalance: tokenBalanceInfo?.balanceFloat || 0,
     nativeBalance: nativeBalanceInfo?.balanceFloat || 0,
-  }
+  };
 }

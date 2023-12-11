@@ -1,5 +1,5 @@
 export const roundValue = (value: any, decimals: number) => {
-  const num = typeof value === 'number' ? value : parseFloat(value);
+  const num = typeof value === "number" ? value : parseFloat(value);
 
   if (isNaN(num)) {
     return value;

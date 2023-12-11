@@ -1,17 +1,17 @@
-import { UseBoxActionArgs, useBoxAction } from '@decent.xyz/box-hooks';
-import { ChainId, TokenInfo } from '@decent.xyz/box-common';
-import { formatUnits } from 'viem';
-import { usdcToken } from '../constants';
+import { UseBoxActionArgs, useBoxAction } from "@decent.xyz/box-hooks";
+import { ChainId, TokenInfo } from "@decent.xyz/box-common";
+import { formatUnits } from "viem";
+import { usdcToken } from "../constants";
 import {
   generateDecentAmountInParams,
   generateDecentAmountOutParams,
-} from '../generateDecentParams';
-import { formatFees } from '../formatFees';
+} from "../generateDecentParams";
+import { formatFees } from "../formatFees";
 
 type UseBoxActionReturn = ReturnType<typeof useBoxAction>;
-export type BoxActionResponse = UseBoxActionReturn['actionResponse'];
+export type BoxActionResponse = UseBoxActionReturn["actionResponse"];
 
-const sampleAddress = '0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045';
+const sampleAddress = "0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045";
 
 export type DecentQuote = {
   actionResponse?: BoxActionResponse;
@@ -24,12 +24,12 @@ export function useAmtOutQuote(
   dstInput: string | null,
   destToken: TokenInfo,
   srcToken: TokenInfo,
-  srcChain: ChainId
+  srcChain: ChainId,
 ) {
   const { actionResponse, isLoading, error } = useDecentAmountOutQuote(
     destToken,
     dstInput ?? undefined,
-    srcToken
+    srcToken,
   );
 
   const appFee = actionResponse?.applicationFee?.amount || 0n;
@@ -48,8 +48,8 @@ export function useAmtOutQuote(
     fees,
     tx,
     errorText: error
-      ? 'Could not find routes. Try a different token pair.'
-      : '',
+      ? "Could not find routes. Try a different token pair."
+      : "",
   };
 }
 
@@ -57,12 +57,12 @@ export function useAmtInQuote(
   srcInput: string | null,
   destToken: TokenInfo,
   srcToken: TokenInfo,
-  srcChain: ChainId
+  srcChain: ChainId,
 ) {
   const { actionResponse, isLoading, error } = useDecentAmountInQuote(
     destToken,
     srcInput ?? undefined,
-    srcToken
+    srcToken,
   );
 
   const appFee = actionResponse?.applicationFee?.amount || 0n;
@@ -81,16 +81,16 @@ export function useAmtInQuote(
     fees,
     tx,
     errorText: error
-      ? 'Could not find routes. Try a different token pair.'
-      : '',
+      ? "Could not find routes. Try a different token pair."
+      : "",
   };
-};
+}
 
 function useDecentAmountOutQuote(
   dstToken: TokenInfo,
   dstAmount?: string,
   srcToken?: TokenInfo,
-  srcChainId?: ChainId
+  srcChainId?: ChainId,
 ): DecentQuote {
   let boxArgs = undefined;
   try {
@@ -102,7 +102,7 @@ function useDecentAmountOutQuote(
       toAddress: sampleAddress,
     });
   } catch (e) {
-    console.log(e)
+    console.log(e);
   }
 
   const quote = useDecentQuote(boxArgs);
@@ -113,12 +113,12 @@ function useDecentAmountOutQuote(
     : parseFloat(formatUnits(tokenPayment.amount, usdcToken.decimals));
 
   return { ...quote, paymentAmt };
-};
+}
 
 function useDecentAmountInQuote(
   dstToken: TokenInfo,
   srcAmount?: string,
-  srcToken?: TokenInfo
+  srcToken?: TokenInfo,
 ): DecentQuote {
   let boxArgs = undefined;
   try {
@@ -130,7 +130,7 @@ function useDecentAmountInQuote(
       toAddress: sampleAddress,
     });
   } catch (e) {
-    console.log(e)
+    console.log(e);
   }
   const quote = useDecentQuote(boxArgs);
 
@@ -145,7 +145,7 @@ function useDecentAmountInQuote(
 const useDecentQuote = (boxActionArgs?: UseBoxActionArgs) => {
   const { actionResponse, isLoading, error } = useBoxAction(
     // TODO: just pass boxActionArgs when useBoxAction can handle undefined
-    boxActionArgs ?? ({ enable: false } as UseBoxActionArgs)
+    boxActionArgs ?? ({ enable: false } as UseBoxActionArgs),
   );
 
   return {

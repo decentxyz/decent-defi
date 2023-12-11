@@ -1,21 +1,29 @@
-import { TokenSelectorComponent } from './TokenSelectorComponent';
-import ChainSelectMenu from '../components/ChainSelectorMenu';
-import { useContext, useEffect, useState, Fragment } from 'react';
-import { RouteSelectContext, getDefaultToken } from '../lib/contexts/routeSelectContext';
-import { ChainId, ethGasToken, EvmTransaction, TokenInfo } from '@decent.xyz/box-common';
-import useDebounced from '../lib/useDebounced';
-import { useAmtInQuote, useAmtOutQuote } from '../lib/hooks/useSwapQuotes';
-import { BoxActionContext } from '../lib/contexts/decentActionContext';
+import { TokenSelectorComponent } from "./TokenSelectorComponent";
+import ChainSelectMenu from "../components/ChainSelectorMenu";
+import { useContext, useEffect, useState, Fragment } from "react";
+import {
+  RouteSelectContext,
+  getDefaultToken,
+} from "../lib/contexts/routeSelectContext";
+import {
+  ChainId,
+  ethGasToken,
+  EvmTransaction,
+  TokenInfo,
+} from "@decent.xyz/box-common";
+import useDebounced from "../lib/useDebounced";
+import { useAmtInQuote, useAmtOutQuote } from "../lib/hooks/useSwapQuotes";
+import { BoxActionContext } from "../lib/contexts/decentActionContext";
 import {
   generateDecentAmountInParams,
   generateDecentAmountOutParams,
-} from '../lib/generateDecentParams';
-import { roundValue } from '../lib/roundValue';
-import { useAccount, useNetwork, useSwitchNetwork } from 'wagmi';
-import { Hex, TransactionReceipt } from 'viem';
-import { useBalance } from '../lib/hooks/useBalance';
-import { sendTx } from '@/lib/sendTx';
-import { getAccount } from '@wagmi/core';
+} from "../lib/generateDecentParams";
+import { roundValue } from "../lib/roundValue";
+import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
+import { Hex, TransactionReceipt } from "viem";
+import { useBalance } from "../lib/hooks/useBalance";
+import { sendTx } from "@/lib/sendTx";
+import { getAccount } from "@wagmi/core";
 
 export default function SwapModal() {
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
@@ -36,7 +44,7 @@ export default function SwapModal() {
   const { dstChain, dstToken } = routeVars;
   const srcToken = routeVars.srcToken;
   const srcChain = routeVars.srcChain;
-  
+
   const setSrcChain = (c: ChainId) => updateRouteVars({ srcChain: c });
   const setSrcToken = (t: TokenInfo) => updateRouteVars({ srcToken: t });
   useEffect(() => {
@@ -46,18 +54,16 @@ export default function SwapModal() {
     });
   }, []);
 
-  const {
-    nativeBalance: srcNativeBalance,
-    tokenBalance: srcTokenBalance,
-  } = useBalance(connectedAddress, srcToken);
+  const { nativeBalance: srcNativeBalance, tokenBalance: srcTokenBalance } =
+    useBalance(connectedAddress, srcToken);
   const srcTokenBalanceRounded = roundValue(srcTokenBalance, 2) ?? 0;
 
   const [submitting, setSubmitting] = useState(false);
-  const [submitErrorText, setSubmitErrorText] = useState('');
+  const [submitErrorText, setSubmitErrorText] = useState("");
 
   const handleSrcAmtChange = (strVal: string) => {
-    if (strVal == '') {
-      setSrcInputVal('');
+    if (strVal == "") {
+      setSrcInputVal("");
       return;
     }
 
@@ -65,7 +71,7 @@ export default function SwapModal() {
     setSrcInputVal(strVal);
     setDstInputVal(null);
     overrideDebouncedDst(null);
-    setSubmitErrorText('');
+    setSubmitErrorText("");
   };
 
   const handleDstAmtChange = (strVal: string) => {
@@ -101,17 +107,17 @@ export default function SwapModal() {
     dstCalcedVal,
   } = useAmtInQuote(srcInputDebounced, dstToken, srcToken, srcChain);
 
-  const srcDisplay = srcCalcedVal ?? srcInputVal ?? '';
-  const dstDisplay = dstCalcedVal ?? dstInputVal ?? '';
+  const srcDisplay = srcCalcedVal ?? srcInputVal ?? "";
+  const dstDisplay = dstCalcedVal ?? dstInputVal ?? "";
 
   useEffect(() => {
     const srcNum = Number(srcDisplay);
     if (srcNum > srcTokenBalance) {
       setSubmitErrorText(
-        'Insufficient funds. Try onramping to fill your wallet.'
+        "Insufficient funds. Try onramping to fill your wallet.",
       );
     } else {
-      setSubmitErrorText('');
+      setSubmitErrorText("");
     }
   }, [srcTokenBalance, srcDisplay]);
 
@@ -161,10 +167,7 @@ export default function SwapModal() {
   };
 
   const onConfirmClick = async () => {
-    console.log(
-      'Sending tx...',
-      actionResponse?.tx
-    );
+    console.log("Sending tx...", actionResponse?.tx);
     try {
       await sendTx({
         account,
@@ -173,23 +176,23 @@ export default function SwapModal() {
         actionResponseTx: actionResponse?.tx as EvmTransaction,
         setSrcTxReceipt,
         setHash,
-        switchNetworkAsync
-      })
+        switchNetworkAsync,
+      });
       setSubmitting(true);
     } catch (e) {
-      console.log('Error sending tx.', e);
+      console.log("Error sending tx.", e);
       setShowContinue(true);
     }
-  }
+  };
 
   return (
     <>
       <div className="group mt-8 bg-white">
         <div
           className={
-            'p-4 rounded-t border' +
-            ' focus-within:border-accent-purple' +
-            ' group-focus-within:border-b-accent-purple'
+            "p-4 rounded-t border" +
+            " focus-within:border-accent-purple" +
+            " group-focus-within:border-b-accent-purple"
           }
         >
           <div className="text-sm">
@@ -203,8 +206,8 @@ export default function SwapModal() {
                 setShowContinue(true);
               }}
               wallet={connectedAddress}
-            />{' '}
-            on{' '}
+            />{" "}
+            on{" "}
             <ChainSelectMenu
               chainId={srcChain}
               onSelectChain={(c) => {
@@ -237,8 +240,8 @@ export default function SwapModal() {
         </div>
         <div
           className={
-            'border border-t-0 p-4 rounded-b' +
-            ' focus-within:border-accent-purple'
+            "border border-t-0 p-4 rounded-b" +
+            " focus-within:border-accent-purple"
           }
         >
           <div className="text-sm">
@@ -251,8 +254,8 @@ export default function SwapModal() {
                 updateRouteVars({ dstToken: t });
               }}
               wallet={connectedAddress}
-            />{' '}
-            on{' '}
+            />{" "}
+            on{" "}
             <ChainSelectMenu
               chainId={dstChain}
               onSelectChain={(c) => {
@@ -278,7 +281,8 @@ export default function SwapModal() {
         </div>
       </div>
       <div className="grid grid-cols-2 gap-x-2 gap-y-1 py-4 px-2 text-sm">
-        {srcInputDebounced && amtInFees &&
+        {srcInputDebounced &&
+          amtInFees &&
           Object.keys(amtInFees).map((feeName) => (
             <Fragment key={feeName}>
               <div>{feeName}</div>
@@ -286,7 +290,8 @@ export default function SwapModal() {
             </Fragment>
           ))}
 
-        {dstInputDebounced && amtOutFees &&
+        {dstInputDebounced &&
+          amtOutFees &&
           Object.keys(amtOutFees).map((feeName) => (
             <Fragment key={feeName}>
               <div>{feeName}</div>
@@ -294,41 +299,39 @@ export default function SwapModal() {
             </Fragment>
           ))}
       </div>
-      <div className='text-red-500'>{submitErrorText}</div>
+      <div className="text-red-500">{submitErrorText}</div>
       <div className="mt-auto"></div>
-      {showContinue ? 
-      <button
-        className={
-          'bg-black text-white text-center font-medium' +
-          ' w-full rounded-lg p-2 mt-4' +
-          ' relative flex items-center justify-center'
-        }
-        onClick={onContinueClick}
-        disabled={continueDisabled}
-      >
-        Confirm Selections
-      </button>
-      :
-      <button
-        className={
-          'bg-primary text-white text-center font-medium' +
-          ' w-full rounded-lg p-2 mt-4' +
-          ' relative flex items-center justify-center'
-        }
-        onClick={onConfirmClick}
-      >
-        Swap
-        {submitting && (
-          <div className="absolute right-4 load-spinner"></div>
-        )}
-      </button>
-      }
-      {srcTxReceipt && 
+      {showContinue ? (
+        <button
+          className={
+            "bg-black text-white text-center font-medium" +
+            " w-full rounded-lg p-2 mt-4" +
+            " relative flex items-center justify-center"
+          }
+          onClick={onContinueClick}
+          disabled={continueDisabled}
+        >
+          Confirm Selections
+        </button>
+      ) : (
+        <button
+          className={
+            "bg-primary text-white text-center font-medium" +
+            " w-full rounded-lg p-2 mt-4" +
+            " relative flex items-center justify-center"
+          }
+          onClick={onConfirmClick}
+        >
+          Swap
+          {submitting && <div className="absolute right-4 load-spinner"></div>}
+        </button>
+      )}
+      {srcTxReceipt && (
         <div>
           <p>{hash}</p>
           <p>{srcTxReceipt.blockHash}</p>
         </div>
-      }
+      )}
     </>
   );
 }

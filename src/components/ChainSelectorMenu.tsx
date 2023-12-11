@@ -1,9 +1,9 @@
-import { Fragment, useEffect } from 'react';
-import Image from 'next/image';
-import { Popover, Transition } from '@headlessui/react';
-import { ChainId } from '@decent.xyz/box-common';
-import { chainIcons, chainNames } from '../lib/contexts/routeSelectContext';
-import { useSearchParams } from 'next/navigation';
+import { Fragment, useEffect } from "react";
+import Image from "next/image";
+import { Popover, Transition } from "@headlessui/react";
+import { ChainId } from "@decent.xyz/box-common";
+import { chainIcons, chainNames } from "../lib/contexts/routeSelectContext";
+import { useSearchParams } from "next/navigation";
 
 const defaultAvailableChains = [
   ChainId.ETHEREUM,
@@ -29,15 +29,15 @@ export default function ChainSelectMenu({
   availableChains = defaultAvailableChains,
   renderBtnInner,
   anchorToRight,
-  className = 'relative inline-block h-6',
+  className = "relative inline-block h-6",
 }: ChainSelectMenuProps) {
   const searchParams = useSearchParams();
   useEffect(() => {
-    const chain = searchParams.get('chain');
+    const chain = searchParams.get("chain");
     if (availableChains.includes(Number(chain))) {
       onSelectChain(Number(chain));
     }
-  }, [searchParams.get('chain')]);
+  }, [searchParams.get("chain")]);
   return (
     <Popover className={className}>
       {({ close }) => (
@@ -71,8 +71,8 @@ export default function ChainSelectMenu({
           >
             <Popover.Panel
               className={
-                'absolute z-10 w-screen max-w-[11rem] px-4 top-full mt-2' +
-                (anchorToRight ? ' -right-4' : ' -left-4')
+                "absolute z-10 w-screen max-w-[11rem] px-4 top-full mt-2" +
+                (anchorToRight ? " -right-4" : " -left-4")
               }
             >
               <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-white py-2">
@@ -80,9 +80,9 @@ export default function ChainSelectMenu({
                   <button
                     key={c}
                     className={
-                      'flex w-full items-center py-1 px-3' +
-                      ' focus:outline-none focus:ring focus:rounded-lg ring-inset' +
-                      (c == chainId ? ' bg-purple-light' : ' hover:bg-seasalt')
+                      "flex w-full items-center py-1 px-3" +
+                      " focus:outline-none focus:ring focus:rounded-lg ring-inset" +
+                      (c == chainId ? " bg-purple-light" : " hover:bg-seasalt")
                     }
                     onClick={() => {
                       onSelectChain(c);

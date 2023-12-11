@@ -1,9 +1,9 @@
-import { useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useUsersBalances } from '@decent.xyz/box-hooks';
-import { ChainId, TokenInfo } from '@decent.xyz/box-common';
-import { TokenSelector } from '@decent.xyz/box-ui';
-import { getAddress, isAddress } from 'viem';
+import { useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { useUsersBalances } from "@decent.xyz/box-hooks";
+import { ChainId, TokenInfo } from "@decent.xyz/box-common";
+import { TokenSelector } from "@decent.xyz/box-ui";
+import { getAddress, isAddress } from "viem";
 
 interface TokenSelectorComponentProps {
   disabled: boolean;
@@ -21,7 +21,7 @@ export const TokenSelectorComponent: React.FC<TokenSelectorComponentProps> = ({
   wallet,
 }) => {
   const searchParams = useSearchParams();
-  const urlToken = searchParams.get('token');
+  const urlToken = searchParams.get("token");
   const userBalances = useUsersBalances({
     address: wallet,
     chainId: currentChain,
@@ -34,7 +34,7 @@ export const TokenSelectorComponent: React.FC<TokenSelectorComponentProps> = ({
     if (selectedToken?.address === formattedToken) return;
 
     const matchingToken = userBalances?.tokens?.find(
-      (t) => t.address === formattedToken
+      (t) => t.address === formattedToken,
     );
 
     if (matchingToken && matchingToken.address !== selectedToken.address) {

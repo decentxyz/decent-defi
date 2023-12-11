@@ -1,9 +1,8 @@
-
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 export default function useDebounced<T>(
   value: T,
-  delayMs = 500
+  delayMs = 500,
 ): [T, (val: T) => void] {
   const [debouncedValue, setDebouncedValue] = useState(value);
   const timeoutRef = useRef<NodeJS.Timeout>();

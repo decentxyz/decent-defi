@@ -1,16 +1,12 @@
-import { useBoxAction, UseBoxActionArgs } from '@decent.xyz/box-hooks';
-import {
-  PropsWithChildren,
-  createContext,
-  useState,
-} from 'react';
+import { useBoxAction, UseBoxActionArgs } from "@decent.xyz/box-hooks";
+import { PropsWithChildren, createContext, useState } from "react";
 
 type UseBoxActionReturn = ReturnType<typeof useBoxAction>;
 
 type BoxActionContextProps = {
   setBoxActionArgs: (boxActionArgs: UseBoxActionArgs | undefined) => void;
   boxActionArgs: UseBoxActionArgs | undefined;
-  boxActionResponse: Omit<UseBoxActionReturn, 'ActionRequest'>;
+  boxActionResponse: Omit<UseBoxActionReturn, "ActionRequest">;
 };
 
 export const BoxActionContext = createContext<BoxActionContextProps>({
@@ -23,14 +19,12 @@ export const BoxActionContext = createContext<BoxActionContextProps>({
   },
 });
 
-export const BoxActionContextProvider = ({
-  children,
-}: PropsWithChildren) => {
+export const BoxActionContextProvider = ({ children }: PropsWithChildren) => {
   const [boxActionArgs, setBoxActionArgs] = useState<
     UseBoxActionArgs | undefined
   >();
   const boxActionResponse = useBoxAction(
-    boxActionArgs ?? ({ enable: false } as UseBoxActionArgs)
+    boxActionArgs ?? ({ enable: false } as UseBoxActionArgs),
   );
 
   const value = {
@@ -45,4 +39,3 @@ export const BoxActionContextProvider = ({
     </BoxActionContext.Provider>
   );
 };
-

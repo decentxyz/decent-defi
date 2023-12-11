@@ -1,7 +1,7 @@
-import { ActionType, TokenInfo } from '@decent.xyz/box-common';
-import { UseBoxActionArgs } from '@decent.xyz/box-hooks';
-import { parseUnits } from 'viem';
-import { usdcToken } from './constants';
+import { ActionType, TokenInfo } from "@decent.xyz/box-common";
+import { UseBoxActionArgs } from "@decent.xyz/box-hooks";
+import { parseUnits } from "viem";
+import { usdcToken } from "./constants";
 
 export const generateDecentAmountInParams = ({
   dstToken,
@@ -17,16 +17,16 @@ export const generateDecentAmountInParams = ({
   toAddress?: string;
 }): UseBoxActionArgs => {
   if (!srcAmount || !Number(srcAmount)) {
-    throw 'no src amount inputted';
+    throw "no src amount inputted";
   }
   if (!connectedAddress) {
-    throw 'no connected address';
+    throw "no connected address";
   }
   if (!toAddress) {
-    throw 'no to address';
+    throw "no to address";
   }
   if (!dstToken) {
-    throw 'no dst token';
+    throw "no dst token";
   }
   return {
     actionType: ActionType.SwapAction,
@@ -34,7 +34,7 @@ export const generateDecentAmountInParams = ({
       dstToken,
       toAddress,
       srcToken,
-      srcAmount
+      srcAmount,
     ),
     srcToken: srcToken.address,
     dstToken: dstToken.address,
@@ -59,10 +59,10 @@ export const generateDecentAmountOutParams = ({
   toAddress?: string;
 }): UseBoxActionArgs | undefined => {
   if (!dstAmount || !Number(dstAmount)) {
-    throw 'no destination amount inputted';
+    throw "no destination amount inputted";
   }
   if (!connectedAddress) {
-    throw 'no connected address';
+    throw "no connected address";
   }
   if (!toAddress) {
     throw `no to address`;
@@ -82,7 +82,7 @@ export const generateDecentAmountOutParams = ({
 const makeActionConfig = (
   dstToken: TokenInfo,
   toAddress: string,
-  dstAmount: string
+  dstAmount: string,
 ) =>
   dstToken.isNative
     ? makeNativeTransferConfig(dstToken, toAddress, dstAmount)
@@ -91,7 +91,7 @@ const makeActionConfig = (
 const makeTokenTransferConfig = (
   dstToken: TokenInfo,
   toAddress: string,
-  dstAmount: string
+  dstAmount: string,
 ) => {
   return {
     contractAddress: dstToken.address,
@@ -101,7 +101,7 @@ const makeTokenTransferConfig = (
       isNative: false,
       tokenAddress: dstToken.address,
     },
-    signature: 'function transfer(address to, uint256 amount)',
+    signature: "function transfer(address to, uint256 amount)",
     args: [toAddress, parseUnits(dstAmount, dstToken.decimals)],
   };
 };
@@ -109,7 +109,7 @@ const makeTokenTransferConfig = (
 const makeNativeTransferConfig = (
   dstToken: TokenInfo,
   toAddress: string,
-  dstAmount: string
+  dstAmount: string,
 ) => {
   return {
     contractAddress: toAddress,
@@ -118,21 +118,21 @@ const makeNativeTransferConfig = (
       amount: parseUnits(dstAmount, dstToken.decimals),
       isNative: true as true,
     },
-    signature: 'function transfer(uint256 amount)',
+    signature: "function transfer(uint256 amount)",
     args: [parseUnits(dstAmount, dstToken.decimals)],
   };
 };
 
 enum SwapDirection {
-  EXACT_AMOUNT_IN = 'exact-amount-in',
-  EXACT_AMOUNT_OUT = 'exact-amount-out',
+  EXACT_AMOUNT_IN = "exact-amount-in",
+  EXACT_AMOUNT_OUT = "exact-amount-out",
 }
 
 const makeAmountInActionConfig = (
   dstToken: TokenInfo,
   toAddress: string,
   srcToken: TokenInfo,
-  srcAmount: string
+  srcAmount: string,
 ) => {
   return {
     chainId: dstToken.chainId,

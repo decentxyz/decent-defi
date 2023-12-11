@@ -3,13 +3,8 @@ import {
   getPublicClient,
   sendTransaction,
   waitForTransaction,
-} from '@wagmi/core';
-import {
-  EstimateGasParameters,
-  Hex,
-  TransactionReceipt,
-  Chain
-} from 'viem';
+} from "@wagmi/core";
+import { EstimateGasParameters, Hex, TransactionReceipt, Chain } from "viem";
 
 export const sendTx = async ({
   account,
@@ -18,17 +13,16 @@ export const sendTx = async ({
   actionResponseTx,
   setSrcTxReceipt,
   setHash,
-  switchNetworkAsync
+  switchNetworkAsync,
 }: {
-  account: any,
-  activeChainId: ChainId,
-  srcChainId: ChainId,
-  actionResponseTx: EvmTransaction,
-  setSrcTxReceipt: (receipt: TransactionReceipt) => void,
-  setHash: (hash: Hex) => void,
-  switchNetworkAsync?: (chainId?: number) => Promise<Chain>
+  account: any;
+  activeChainId: ChainId;
+  srcChainId: ChainId;
+  actionResponseTx: EvmTransaction;
+  setSrcTxReceipt: (receipt: TransactionReceipt) => void;
+  setHash: (hash: Hex) => void;
+  switchNetworkAsync?: (chainId?: number) => Promise<Chain>;
 }) => {
-
   try {
     const publicClient = getPublicClient();
     if (activeChainId !== srcChainId) {
@@ -52,5 +46,5 @@ export const sendTx = async ({
     } catch (e) {}
   } catch (e) {
     console.error(e);
-  };
+  }
 };
