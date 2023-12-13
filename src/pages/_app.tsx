@@ -1,7 +1,9 @@
-import "@decent.xyz/box-ui/index.css";
+import '@decent.xyz/box-ui/index.css';
 import "../styles/globals.css";
-import type { AppProps } from "next/app";
+import 'react-toastify/dist/ReactToastify.css';
 import "@rainbow-me/rainbowkit/styles.css";
+
+import type { AppProps } from "next/app";
 import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import {
   arbitrum,
@@ -18,6 +20,7 @@ import localFont from "next/font/local";
 import { BoxHooksContextProvider } from "@decent.xyz/box-hooks";
 import { BoxActionContextProvider } from "../lib/contexts/decentActionContext";
 import RouteSelectProvider from "../lib/contexts/routeSelectContext";
+import { ToastContainer } from 'react-toastify';
 
 const { chains, publicClient } = configureChains(
   [mainnet, polygon, optimism, arbitrum, base, avalanche],
@@ -58,6 +61,7 @@ export default function App({ Component, pageProps }: AppProps) {
               <BoxActionContextProvider>
                 <div className={`${monument.variable} font-sans`}>
                   <Component {...pageProps} />
+                  <ToastContainer />
                 </div>
               </BoxActionContextProvider>
             </RouteSelectProvider>

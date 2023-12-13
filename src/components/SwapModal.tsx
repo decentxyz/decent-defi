@@ -11,6 +11,7 @@ import {
   EvmTransaction,
   TokenInfo,
 } from "@decent.xyz/box-common";
+import { polygonGasToken } from "@/lib/constants";
 import useDebounced from "../lib/useDebounced";
 import { useAmtInQuote, useAmtOutQuote } from "../lib/hooks/useSwapQuotes";
 import { BoxActionContext } from "../lib/contexts/decentActionContext";
@@ -20,10 +21,10 @@ import {
 } from "../lib/generateDecentParams";
 import { roundValue } from "../lib/roundValue";
 import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import { Hex, TransactionReceipt } from "viem";
+import { Hex, TransactionReceipt, EstimateGasParameters } from "viem";
 import { useBalance } from "../lib/hooks/useBalance";
-import { sendTx } from "@/lib/sendTx";
-import { getAccount } from "@wagmi/core";
+import { getAccount, getPublicClient, sendTransaction, waitForTransaction } from "@wagmi/core";
+import { toast } from "react-toastify";
 
 export default function SwapModal() {
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
@@ -49,7 +50,7 @@ export default function SwapModal() {
   const setSrcToken = (t: TokenInfo) => updateRouteVars({ srcToken: t });
   useEffect(() => {
     updateRouteVars({
-      srcChain: ChainId.ARBITRUM,
+      srcChain: ChainId.ETHEREUM,
       srcToken: ethGasToken,
     });
   }, []);
@@ -128,18 +129,28 @@ export default function SwapModal() {
     !!submitErrorText ||
     !!amtOutErrorText ||
     !!amtInErrorText ||
+    !chain ||
     srcSpinning ||
     dstSpinning ||
     !(Number(srcInputDebounced) || Number(dstInputDebounced)) ||
     submitting;
+  
+  const confirmDisabled = !actionResponse?.tx;
 
   const onContinueClick = () => {
-    if (continueDisabled || !chain) return;
-    setSubmitting(true);
     setBoxActionArgs(undefined);
+    if (chain?.id !== srcChain) {
+      toast.warning('Please switch networks.', {
+        position: toast.POSITION.BOTTOM_CENTER
+      })
+      switchNetworkAsync?.(srcChain);
+      return;
+    }
+    if (continueDisabled) return;
+    setSubmitting(true);    
     updateRouteVars({
       purchaseName: `${Number(srcDisplay).toPrecision(2)} ${dstToken.symbol}`,
-    });
+    }); 
     if (srcInputDebounced) {
       const actionArgs = generateDecentAmountInParams({
         srcToken,
@@ -150,6 +161,7 @@ export default function SwapModal() {
       });
       setBoxActionArgs(actionArgs);
       setShowContinue(false);
+      setSubmitting(false);
     } else if (dstInputDebounced) {
       const actionArgs = generateDecentAmountOutParams({
         srcToken,
@@ -160,6 +172,7 @@ export default function SwapModal() {
       });
       setBoxActionArgs(actionArgs);
       setShowContinue(false);
+      setSubmitting(false);
     } else {
       setSubmitting(false);
       throw "Can't submit!";
@@ -167,21 +180,32 @@ export default function SwapModal() {
   };
 
   const onConfirmClick = async () => {
-    console.log("Sending tx...", actionResponse?.tx);
-    try {
-      await sendTx({
-        account,
-        activeChainId: chain?.id!,
-        srcChainId: srcChain,
-        actionResponseTx: actionResponse?.tx as EvmTransaction,
-        setSrcTxReceipt,
-        setHash,
-        switchNetworkAsync,
+    if (!actionResponse) {
+      toast.error('Failed to fetch routes', {
+        position: toast.POSITION.BOTTOM_CENTER
       });
+    } else {
       setSubmitting(true);
-    } catch (e) {
-      console.log("Error sending tx.", e);
-      setShowContinue(true);
+      console.log("Sending tx...", actionResponse.tx);
+      try {
+        const tx = actionResponse.tx as EvmTransaction;
+        const publicClient = getPublicClient();
+        
+        const gas = await publicClient.estimateGas({
+          account,
+          ...tx,
+        } as unknown as EstimateGasParameters);
+        console.log("Gas estimate", gas);
+        
+        const { hash } = await sendTransaction(tx);
+
+        setSubmitting(false);
+        setHash(hash);
+      } catch (e) {
+        console.log("Error sending tx.", e);
+        setShowContinue(true);
+        setSubmitting(false);
+      }
     }
   };
 
@@ -304,7 +328,8 @@ export default function SwapModal() {
       {showContinue ? (
         <button
           className={
-            "bg-black text-white text-center font-medium" +
+            `${continueDisabled ? 'bg-gray-300 text-gray-600 ' : 'bg-black text-white '}` +
+            "text-center font-medium" +
             " w-full rounded-lg p-2 mt-4" +
             " relative flex items-center justify-center"
           }
@@ -316,10 +341,12 @@ export default function SwapModal() {
       ) : (
         <button
           className={
-            "bg-primary text-white text-center font-medium" +
+            `${confirmDisabled ? 'bg-gray-300 text-gray-600 ': 'bg-primary text-white '}` +
+            "text-center font-medium" +
             " w-full rounded-lg p-2 mt-4" +
             " relative flex items-center justify-center"
           }
+          disabled={confirmDisabled}
           onClick={onConfirmClick}
         >
           Swap

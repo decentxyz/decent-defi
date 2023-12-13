@@ -27,7 +27,6 @@ export const TokenSelectorComponent: React.FC<TokenSelectorComponentProps> = ({
     chainId: currentChain,
   });
 
-  // match to url
   useEffect(() => {
     if (!urlToken || !isAddress(urlToken)) return;
     const formattedToken = getAddress(urlToken);
@@ -43,7 +42,7 @@ export const TokenSelectorComponent: React.FC<TokenSelectorComponentProps> = ({
   }, [urlToken, userBalances]);
 
   return (
-    <div className="inline-flex items-center border border-[#BEC3C9] rounded px-1">
+    <div className="inline-flex items-center border border-[#BEC3C9] rounded px-1 py-1">
       <TokenSelector
         disabled={disabled}
         selectedToken={selectedToken}

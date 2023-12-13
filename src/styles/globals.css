@@ -45,10 +45,9 @@ input[type="number"] {
 }
 
 .load-spinner {
-  border: 2px solid;
+  border: 2px solid #5a5a5a;
   border-top-color: transparent;
-  border-left-color: transparent;
-  border-color: #9969FF;
+  border-right-color: transparent;
   height: 1rem;
   width: 1rem;
   border-radius: 9999px;
@@ -56,28 +55,27 @@ input[type="number"] {
 }
 
 @keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
   to {
     transform: rotate(360deg);
   }
 }
 
-
-.collectionBannerFlex, .collectionBannerGrid {
-  width: 100%;
-  position: relative;
+.load-shine {
+  background-image: linear-gradient(
+    90deg,
+    #ececec 8%,
+    #f5f5f5 18%,
+    #ececec 33%
+  );
+  background-size: 200% 100%;
+  animation: 1.5s load-shine linear infinite;
 }
 
-.collectionBannerFlex {
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: center;
-  padding: 100px 20px;
-  min-height: 100vh;
-}
-
-.blurrer {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0);
-  backdrop-filter: blur(9px);
+@keyframes load-shine {
+  to {
+    background-position-x: -200%;
+  }
 }

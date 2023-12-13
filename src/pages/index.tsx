@@ -29,13 +29,13 @@ export default function Index() {
           <SwapModal />
         </div>
       </div>
-      <div className="absolute bottom-4 flex w-full justify-center text-gray-500">
-        <span className="pr-1">Powered by</span>
+      <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center">
+        <span className="pr-2">Powered by</span>
         <Link
           href="http://decent.xyz/"
           className="hover:opacity-80 hover:underline"
         >
-          Decent
+          <Image src='/decent.png' width={80} height={10} alt='decent-logo' />
         </Link>
       </div>
     </div>
