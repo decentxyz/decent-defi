@@ -1,5 +1,5 @@
 import SwapModal from "../components/SwapModal";
-import { ConnectButton } from "@rainbow-me/rainbowkit";
+import LoginButton from "@/components/LoginButton";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -10,7 +10,7 @@ export default function Index() {
         <a
           href="https://checkout.decent.xyz/"
           target="_blank"
-          className="py-2 px-4 bg-white rounded-md drop-shadow-md font-medium flex items-center gap-2"
+          className="flex items-center gap-1.5 bg-white rounded border group px-2 py-1"
         >
           <div>
             <Image
@@ -22,7 +22,7 @@ export default function Index() {
           </div>
           Buy Crypto
         </a>
-        <ConnectButton />
+        <LoginButton />
       </div>
       <div className="w-full flex justify-center mt-4">
         <div className="sm:w-[480px]">

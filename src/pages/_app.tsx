@@ -1,10 +1,10 @@
 import '@decent.xyz/box-ui/index.css';
 import "../styles/globals.css";
 import 'react-toastify/dist/ReactToastify.css';
-import "@rainbow-me/rainbowkit/styles.css";
 
 import type { AppProps } from "next/app";
-import { getDefaultWallets, RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { PrivyProvider, PrivyClientConfig } from '@privy-io/react-auth';
+import { PrivyWagmiConnector } from '@privy-io/wagmi-connector';
 import {
   arbitrum,
   mainnet,
@@ -13,7 +13,7 @@ import {
   base,
   avalanche,
 } from "wagmi/chains";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
+import { configureChains } from "wagmi";
 import { publicProvider } from "wagmi/providers/public";
 import { alchemyProvider } from "wagmi/providers/alchemy";
 import localFont from "next/font/local";
@@ -22,25 +22,25 @@ import { BoxActionContextProvider } from "../lib/contexts/decentActionContext";
 import RouteSelectProvider from "../lib/contexts/routeSelectContext";
 import { ToastContainer } from 'react-toastify';
 
-const { chains, publicClient } = configureChains(
-  [mainnet, polygon, optimism, arbitrum, base, avalanche],
-  [
+const configureChainsConfig = configureChains(
+  [mainnet, polygon, optimism, arbitrum, base, avalanche], [
     alchemyProvider({
-      apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
-    }),
-    publicProvider(),
-  ],
-);
-const { connectors } = getDefaultWallets({
-  appName: "My RainbowKit App",
-  projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_ID as string,
-  chains,
-});
-const wagmiConfig = createConfig({
-  autoConnect: true,
-  connectors,
-  publicClient,
-});
+    apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY as string,
+  }),
+  publicProvider(),
+]);
+
+const privyConfig: PrivyClientConfig = {
+  embeddedWallets: {
+    createOnLogin: 'users-without-wallets',
+    requireUserPasswordOnCreate: true,
+    noPromptOnSignature: false,
+  },
+  loginMethods: ['wallet', 'email', 'sms'],
+  appearance: {
+    showWalletLoginFirst: true,
+  },
+};
 
 export const monument = localFont({
   src: "../fonts/EduMonumentGroteskVariable.woff2",
@@ -52,8 +52,8 @@ export default function App({ Component, pageProps }: AppProps) {
     <div
       className={`${monument.variable} font-sans flex flex-col min-h-screen`}
     >
-      <WagmiConfig config={wagmiConfig}>
-        <RainbowKitProvider chains={chains}>
+      <PrivyProvider appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID as string} config={privyConfig}>
+        <PrivyWagmiConnector wagmiChainsConfig={configureChainsConfig}>
           <BoxHooksContextProvider
             apiKey={process.env.NEXT_PUBLIC_DECENT_API_KEY as string}
           >
@@ -66,8 +66,8 @@ export default function App({ Component, pageProps }: AppProps) {
               </BoxActionContextProvider>
             </RouteSelectProvider>
           </BoxHooksContextProvider>
-        </RainbowKitProvider>
-      </WagmiConfig>
+        </PrivyWagmiConnector>
+      </PrivyProvider>
     </div>
   );
 }

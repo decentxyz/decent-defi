@@ -11,7 +11,6 @@ import {
   EvmTransaction,
   TokenInfo,
 } from "@decent.xyz/box-common";
-import { polygonGasToken } from "@/lib/constants";
 import useDebounced from "../lib/useDebounced";
 import { useAmtInQuote, useAmtOutQuote } from "../lib/hooks/useSwapQuotes";
 import { BoxActionContext } from "../lib/contexts/decentActionContext";
@@ -20,11 +19,12 @@ import {
   generateDecentAmountOutParams,
 } from "../lib/generateDecentParams";
 import { roundValue } from "../lib/roundValue";
-import { useAccount, useNetwork, useSwitchNetwork } from "wagmi";
-import { Hex, TransactionReceipt, EstimateGasParameters } from "viem";
+import { useNetwork } from "wagmi";
+import { Hex } from "viem";
 import { useBalance } from "../lib/hooks/useBalance";
-import { getAccount, getPublicClient, sendTransaction, waitForTransaction } from "@wagmi/core";
+import { sendTransaction } from "@wagmi/core";
 import { toast } from "react-toastify";
+import usePrivyAddress from "../lib/hooks/usePrivyAddress";
 
 export default function SwapModal() {
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
@@ -34,13 +34,10 @@ export default function SwapModal() {
   } = useContext(BoxActionContext);
 
   const { chain } = useNetwork();
-  const { switchNetworkAsync } = useSwitchNetwork();
-  const { address: connectedAddress } = useAccount();
-  const account = getAccount();
+  const { connectedAddress, bp, privyWallet } = usePrivyAddress();
 
   const [showContinue, setShowContinue] = useState(true);
   const [hash, setHash] = useState<Hex>();
-  const [srcTxReceipt, setSrcTxReceipt] = useState<TransactionReceipt>();
 
   const { dstChain, dstToken } = routeVars;
   const srcToken = routeVars.srcToken;
@@ -137,13 +134,13 @@ export default function SwapModal() {
   
   const confirmDisabled = !actionResponse?.tx;
 
-  const onContinueClick = () => {
+  const onContinueClick = async () => {
     setBoxActionArgs(undefined);
     if (chain?.id !== srcChain) {
       toast.warning('Please switch networks.', {
         position: toast.POSITION.BOTTOM_CENTER
       })
-      switchNetworkAsync?.(srcChain);
+      await privyWallet?.switchChain(srcChain)
       return;
     }
     if (continueDisabled) return;
@@ -186,22 +183,15 @@ export default function SwapModal() {
       });
     } else {
       setSubmitting(true);
-      console.log("Sending tx...", actionResponse.tx);
       try {
         const tx = actionResponse.tx as EvmTransaction;
-        const publicClient = getPublicClient();
-        
-        const gas = await publicClient.estimateGas({
-          account,
-          ...tx,
-        } as unknown as EstimateGasParameters);
-        console.log("Gas estimate", gas);
-        
         const { hash } = await sendTransaction(tx);
-
         setSubmitting(false);
         setHash(hash);
       } catch (e) {
+        toast.error('Error sending transaction.', {
+          position: toast.POSITION.BOTTOM_CENTER
+        });
         console.log("Error sending tx.", e);
         setShowContinue(true);
         setSubmitting(false);
@@ -353,10 +343,9 @@ export default function SwapModal() {
           {submitting && <div className="absolute right-4 load-spinner"></div>}
         </button>
       )}
-      {srcTxReceipt && (
+      {hash && (
         <div>
           <p>{hash}</p>
-          <p>{srcTxReceipt.blockHash}</p>
         </div>
       )}
     </>

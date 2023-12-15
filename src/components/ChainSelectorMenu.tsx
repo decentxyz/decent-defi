@@ -4,15 +4,7 @@ import { Popover, Transition } from "@headlessui/react";
 import { ChainId } from "@decent.xyz/box-common";
 import { chainIcons, chainNames } from "../lib/contexts/routeSelectContext";
 import { useSearchParams } from "next/navigation";
-
-const defaultAvailableChains = [
-  ChainId.ETHEREUM,
-  ChainId.OPTIMISM,
-  ChainId.ARBITRUM,
-  ChainId.POLYGON,
-  ChainId.BASE,
-  ChainId.AVALANCHE,
-];
+import { defaultAvailableChains } from "@/lib/constants";
 
 export interface ChainSelectMenuProps {
   chainId: ChainId;

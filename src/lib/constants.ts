@@ -24,3 +24,12 @@ export const usdcToken: TokenInfo = {
   chainId: ChainId.OPTIMISM,
   isNative: false,
 };
+
+export const defaultAvailableChains = [
+  ChainId.ETHEREUM,
+  ChainId.OPTIMISM,
+  ChainId.ARBITRUM,
+  ChainId.POLYGON,
+  ChainId.BASE,
+  ChainId.AVALANCHE,
+];
