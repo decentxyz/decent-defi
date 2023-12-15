@@ -186,7 +186,6 @@ export default function SwapModal() {
       try {
         const tx = actionResponse.tx as EvmTransaction;
         const { hash } = await sendTransaction(tx);
-
         setSubmitting(false);
         setHash(hash);
       } catch (e) {

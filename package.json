@@ -14,7 +14,7 @@
     "@decent.xyz/box-ui": "^1.0.42",
     "@headlessui/react": "^1.7.17",
     "@privy-io/react-auth": "^1.51.1",
-    "@privy-io/wagmi-connector": "^0.1.8",
+    "@privy-io/wagmi-connector": "^0.1.9",
     "@types/node": "20.5.4",
     "@types/react-dom": "18.2.7",
     "@wagmi/core": "^1.4.5",
