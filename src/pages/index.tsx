@@ -1,9 +1,13 @@
+import { useState } from "react";
 import SwapModal from "../components/SwapModal";
+import BuyModal from "@/components/BuyModal";
 import LoginButton from "@/components/LoginButton";
 import Link from "next/link";
 import Image from "next/image";
 
 export default function Index() {
+  const [activeTab, setActiveTab] = useState<string>('Bridge');
+
   return (
     <div className="px-8 bg-gray-100 min-h-screen relative">
       <div className="flex justify-between py-4 items-center">
@@ -24,11 +28,36 @@ export default function Index() {
         </a>
         <LoginButton />
       </div>
-      <div className="w-full flex justify-center mt-4">
-        <div className="sm:w-[480px]">
-          <SwapModal />
+
+      <div className="flex flex-col items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <nav className="flex mb-5">
+            {['bridge', 'buy', 'onboard'].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`flex-1 py-2 text-sm font-medium text-center ${
+                  activeTab === tab ? 'border-b-2 border-primary text-primary' : 'text-gray-600'
+                }`}
+              >
+                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+              </button>
+            ))}
+          </nav>
+          <div>
+            <div className={`${activeTab !== 'bridge' ? 'hidden' : ''}`}>
+              <SwapModal />
+            </div>
+            <div className={`${activeTab !== 'buy' ? 'hidden' : ''}`}>
+              <BuyModal />
+            </div>
+            <div className={`${activeTab !== 'onboard' ? 'hidden' : ''}`}>
+              {/* Onboard tab content */}
+            </div>
+          </div>
         </div>
       </div>
+
       <div className="absolute bottom-4 left-0 right-0 flex justify-center items-center">
         <span className="pr-2">Powered by</span>
         <Link
