@@ -4,14 +4,11 @@ import { useContext, useState } from "react";
 import {
   RouteSelectContext,
 } from "../lib/contexts/routeSelectContext";
-import usePrivyAddress from "../lib/hooks/usePrivyAddress";
 
-export default function BuyModal() {
+export default function BuyModal({ connectedAddress }: any) {
   const REDIRECT_URL = 'https://decent.xyz';
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
   const { dstChain, dstToken } = routeVars;
-
-  const { connectedAddress } = usePrivyAddress();
 
   const handleDstAmtChange = (strVal: string) => {
     if (!/^\d*\.?\d*$/.test(strVal)) return;

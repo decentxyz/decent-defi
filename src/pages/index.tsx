@@ -1,12 +1,16 @@
 import { useState } from "react";
 import SwapModal from "../components/SwapModal";
 import BuyModal from "@/components/BuyModal";
+import OnboardModal from "@/components/OnboardModal";
 import LoginButton from "@/components/LoginButton";
 import Link from "next/link";
 import Image from "next/image";
+import usePrivyAddress from "../lib/hooks/usePrivyAddress";
 
 export default function Index() {
-  const [activeTab, setActiveTab] = useState<string>('Bridge');
+  const featuredDeFiFunctions = ['bridge', 'deposit', 'buy', 'onboard'];
+  const [activeTab, setActiveTab] = useState<string>('bridge');
+  const { connectedAddress, bp, privyWallet } = usePrivyAddress();
 
   return (
     <div className="px-8 bg-gray-100 min-h-screen relative">
@@ -32,7 +36,7 @@ export default function Index() {
       <div className="flex flex-col items-center justify-center p-6">
         <div className="w-full max-w-md">
           <nav className="flex mb-5">
-            {['bridge', 'buy', 'onboard'].map((tab) => (
+            {featuredDeFiFunctions.map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -46,13 +50,16 @@ export default function Index() {
           </nav>
           <div>
             <div className={`${activeTab !== 'bridge' ? 'hidden' : ''}`}>
-              <SwapModal />
+              <SwapModal 
+                connectedAddress={connectedAddress}
+                privyWallet={privyWallet}
+              />
             </div>
             <div className={`${activeTab !== 'buy' ? 'hidden' : ''}`}>
-              <BuyModal />
+              <BuyModal connectedAddress={connectedAddress} />
             </div>
             <div className={`${activeTab !== 'onboard' ? 'hidden' : ''}`}>
-              {/* Onboard tab content */}
+              <OnboardModal connectedAddress={connectedAddress} />
             </div>
           </div>
         </div>

@@ -24,9 +24,8 @@ import { Hex } from "viem";
 import { useBalance } from "../lib/hooks/useBalance";
 import { sendTransaction } from "@wagmi/core";
 import { toast } from "react-toastify";
-import usePrivyAddress from "../lib/hooks/usePrivyAddress";
 
-export default function SwapModal() {
+export default function SwapModal({ connectedAddress, privyWallet }: any) {
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
   const {
     setBoxActionArgs,
@@ -34,7 +33,7 @@ export default function SwapModal() {
   } = useContext(BoxActionContext);
 
   const { chain } = useNetwork();
-  const { connectedAddress, bp, privyWallet } = usePrivyAddress();
+  
 
   const [showContinue, setShowContinue] = useState(true);
   const [hash, setHash] = useState<Hex>();
