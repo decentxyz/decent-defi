@@ -8,22 +8,16 @@ import {
 import {
   ChainId,
   ethGasToken,
-  EvmTransaction,
   TokenInfo,
 } from "@decent.xyz/box-common";
 import useDebounced from "../lib/useDebounced";
 import { useAmtInQuote, useAmtOutQuote } from "../lib/hooks/useSwapQuotes";
 import { BoxActionContext } from "../lib/contexts/decentActionContext";
-import {
-  generateDecentAmountInParams,
-  generateDecentAmountOutParams,
-} from "../lib/generateDecentParams";
 import { roundValue } from "../lib/roundValue";
 import { useNetwork } from "wagmi";
 import { Hex } from "viem";
 import { useBalance } from "../lib/hooks/useBalance";
-import { sendTransaction } from "@wagmi/core";
-import { toast } from "react-toastify";
+import { confirmRoute, executeTransaction } from "@/lib/executeTransaction";
 
 export default function SwapModal({ connectedAddress, privyWallet }: any) {
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
@@ -33,7 +27,6 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
   } = useContext(BoxActionContext);
 
   const { chain } = useNetwork();
-  
 
   const [showContinue, setShowContinue] = useState(true);
   const [hash, setHash] = useState<Hex>();
@@ -132,71 +125,6 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
     submitting;
   
   const confirmDisabled = !actionResponse?.tx;
-
-  const onContinueClick = async () => {
-    setBoxActionArgs(undefined);
-    if (chain?.id !== srcChain) {
-      toast.warning('Please switch networks.', {
-        position: toast.POSITION.BOTTOM_CENTER
-      })
-      await privyWallet?.switchChain(srcChain)
-      return;
-    }
-    if (continueDisabled) return;
-    setSubmitting(true);    
-    updateRouteVars({
-      purchaseName: `${Number(srcDisplay).toPrecision(2)} ${dstToken.symbol}`,
-    }); 
-    if (srcInputDebounced) {
-      const actionArgs = generateDecentAmountInParams({
-        srcToken,
-        dstToken: dstToken,
-        srcAmount: srcInputDebounced,
-        connectedAddress,
-        toAddress: connectedAddress,
-      });
-      setBoxActionArgs(actionArgs);
-      setShowContinue(false);
-      setSubmitting(false);
-    } else if (dstInputDebounced) {
-      const actionArgs = generateDecentAmountOutParams({
-        srcToken,
-        dstToken: dstToken,
-        dstAmount: dstInputDebounced,
-        connectedAddress,
-        toAddress: connectedAddress,
-      });
-      setBoxActionArgs(actionArgs);
-      setShowContinue(false);
-      setSubmitting(false);
-    } else {
-      setSubmitting(false);
-      throw "Can't submit!";
-    }
-  };
-
-  const onConfirmClick = async () => {
-    if (!actionResponse) {
-      toast.error('Failed to fetch routes', {
-        position: toast.POSITION.BOTTOM_CENTER
-      });
-    } else {
-      setSubmitting(true);
-      try {
-        const tx = actionResponse.tx as EvmTransaction;
-        const { hash } = await sendTransaction(tx);
-        setSubmitting(false);
-        setHash(hash);
-      } catch (e) {
-        toast.error('Error sending transaction.', {
-          position: toast.POSITION.BOTTOM_CENTER
-        });
-        console.log("Error sending tx.", e);
-        setShowContinue(true);
-        setSubmitting(false);
-      }
-    }
-  };
 
   return (
     <>
@@ -322,7 +250,22 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
             " w-full rounded-lg p-2 mt-4" +
             " relative flex items-center justify-center"
           }
-          onClick={onContinueClick}
+          onClick={() => confirmRoute({
+            chain: chain!,
+            srcChain,
+            srcToken,
+            dstToken,
+            setBoxActionArgs,
+            updateRouteVars,
+            srcInputVal: srcInputDebounced!,
+            dstInputVal: dstInputDebounced!,
+            privyWallet,
+            connectedAddress,
+            continueDisabled,
+            setSubmitting,
+            setShowContinue,
+            srcDisplay
+          })}
           disabled={continueDisabled}
         >
           Confirm Selections
@@ -336,7 +279,12 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
             " relative flex items-center justify-center"
           }
           disabled={confirmDisabled}
-          onClick={onConfirmClick}
+          onClick={() => executeTransaction({
+            actionResponse,
+            setSubmitting,
+            setHash,
+            setShowContinue
+          })}
         >
           Swap
           {submitting && <div className="absolute right-4 load-spinner"></div>}

@@ -59,7 +59,7 @@ export default function Index() {
               <BuyModal connectedAddress={connectedAddress} />
             </div>
             <div className={`${activeTab !== 'onboard' ? 'hidden' : ''}`}>
-              <OnboardModal connectedAddress={connectedAddress} />
+              <OnboardModal connectedAddress={connectedAddress} setActiveTab={setActiveTab} privyWallet={privyWallet} />
             </div>
           </div>
         </div>

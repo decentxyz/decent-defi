@@ -3,6 +3,8 @@ import { ChainId, TokenInfo } from "@decent.xyz/box-common";
 
 const polygonLogo = "https://cryptologos.cc/logos/polygon-matic-logo.png?v=025";
 
+export const daiLogo= 'https://static.alchemyapi.io/images/assets/4943.png'
+
 export const polygonGasToken: TokenInfo = {
   address: zeroAddress,
   decimals: 18,

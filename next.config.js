@@ -19,6 +19,11 @@ const nextConfig = {
         hostname: 'raw.githubusercontent.com',
         port: '',
       },
+      {
+        protocol: 'https',
+        hostname: 's2.coinmarketcap.com',
+        port: '',
+      },
     ],
   },
 };
