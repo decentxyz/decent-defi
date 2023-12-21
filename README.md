@@ -19,7 +19,7 @@ Hi 👋. This is an example repository for [Box Hooks](https://docs.decent.xyz/d
     - You can specify defaults in this file. For example, if you would like users to swap into a specific token, you should specify that as the `dstToken` when creating the context and disable the destination token and chain selector in the swap modal.
 
   - `src/lib/contexts/decentActionContext.tsx`: provides a context for the calldata for the transaction based on the route variables
-  - `src/lib/sendTx`: called in the Swap Modal, this function actually sends the transaction specified by the `decentActionContext`
+  - `src/lib/executeTx`: called in the `Swap Modal`, `DepositModal`, and `OnboardModal`, this function actually sends the transaction specified by the `decentActionContext`
 
 ### 2. Deposit
 - Coming Soon
