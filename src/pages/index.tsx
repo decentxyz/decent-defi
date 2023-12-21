@@ -2,6 +2,7 @@ import { useState } from "react";
 import SwapModal from "../components/SwapModal";
 import BuyModal from "@/components/BuyModal";
 import OnboardModal from "@/components/OnboardModal";
+import DepositModal from "@/components/DepositModal";
 import LoginButton from "@/components/LoginButton";
 import Link from "next/link";
 import Image from "next/image";
@@ -54,6 +55,9 @@ export default function Index() {
                 connectedAddress={connectedAddress}
                 privyWallet={privyWallet}
               />
+            </div>
+            <div className={`${activeTab !== 'deposit' ? 'hidden' : ''}`}>
+              <DepositModal connectedAddress={connectedAddress} privyWallet={privyWallet} />
             </div>
             <div className={`${activeTab !== 'buy' ? 'hidden' : ''}`}>
               <BuyModal connectedAddress={connectedAddress} />

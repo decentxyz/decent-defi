@@ -51,13 +51,18 @@ export const generateDecentAmountOutParams = ({
   srcToken = usdcToken,
   connectedAddress,
   toAddress,
+  signature,
+  args
 }: {
   dstToken: TokenInfo;
   dstAmount?: string;
   srcToken?: TokenInfo;
   connectedAddress?: string;
   toAddress?: string;
+  signature?: string;
+  args?: any;
 }): UseBoxActionArgs | undefined => {
+  let txConfig;
   if (!dstAmount || !Number(dstAmount)) {
     throw "no destination amount inputted";
   }
@@ -67,9 +72,14 @@ export const generateDecentAmountOutParams = ({
   if (!toAddress) {
     throw `no to address`;
   }
+  if (signature) {
+    txConfig = makeEvmActionConfig(dstToken, signature, args, dstAmount);
+  } else {
+    txConfig = makeActionConfig(dstToken, toAddress, dstAmount);
+  }
   return {
     actionType: ActionType.NftMint,
-    actionConfig: makeActionConfig(dstToken, toAddress, dstAmount),
+    actionConfig: txConfig,
     srcToken: srcToken.address,
     dstToken: dstToken.address,
     srcChainId: srcToken.chainId,
@@ -120,6 +130,24 @@ const makeNativeTransferConfig = (
     },
     signature: "function transfer(uint256 amount)",
     args: [parseUnits(dstAmount, dstToken.decimals)],
+  };
+};
+
+const makeEvmActionConfig = (
+  dstToken: TokenInfo, 
+  signature: string, 
+  args: any, 
+  dstAmount: string
+) => {
+  return {
+    contractAddress: dstToken.address,
+    chainId: dstToken.chainId,
+    cost: {
+      amount: parseUnits(dstAmount, dstToken.decimals),
+      isNative: true as true,
+    },
+    signature,
+    args,
   };
 };
 

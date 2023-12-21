@@ -23,6 +23,8 @@ export const confirmRoute = async ({
   setSubmitting,
   setShowContinue,
   srcDisplay,
+  signature,
+  args,
 }: {
   srcChain: ChainId,
   srcToken: TokenInfo,
@@ -39,8 +41,28 @@ export const confirmRoute = async ({
   setSubmitting?: (submitting: boolean) => void,
   setShowContinue?: (showContinue: boolean) => void,
   srcDisplay?: string,
+  signature?: string,
+  args?: any
 }) => {
   const toAddress = recipient || connectedAddress;
+  const amtOutConfig = signature ? 
+    { 
+      srcToken,
+      dstToken: dstToken,
+      dstAmount: dstInputVal,
+      connectedAddress,
+      toAddress,
+      signature,
+      args
+     } : 
+    { 
+      srcToken,
+      dstToken: dstToken,
+      dstAmount: dstInputVal,
+      connectedAddress,
+      toAddress,
+    };
+ 
   setBoxActionArgs(undefined);
   if (chain?.id !== srcChain) {
     toast.warning('Please switch networks.', {
@@ -66,13 +88,7 @@ export const confirmRoute = async ({
     setShowContinue?.(false);
     setSubmitting?.(false);
   } else if (dstInputVal) {
-    const actionArgs = generateDecentAmountOutParams({
-      srcToken,
-      dstToken: dstToken,
-      dstAmount: dstInputVal,
-      connectedAddress,
-      toAddress,
-    });
+    const actionArgs = generateDecentAmountOutParams(amtOutConfig);
     setBoxActionArgs(actionArgs);
     setShowContinue?.(false);
     setSubmitting?.(false);
