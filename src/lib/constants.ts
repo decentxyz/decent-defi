@@ -15,10 +15,10 @@ export const polygonGasToken: TokenInfo = {
   isNative: true,
 };
 
-export const USDC_OPTIMISM = "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85";
+const USDCE_OPTIMISM = "0x7F5c764cBc14f9669B88837ca1490cCa17c31607";
 
 export const usdcToken: TokenInfo = {
-  address: USDC_OPTIMISM,
+  address: USDCE_OPTIMISM,
   decimals: 6,
   name: "USD Coin",
   symbol: "USDC",

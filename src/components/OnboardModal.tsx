@@ -9,7 +9,6 @@ import { BoxActionContext } from '@/lib/contexts/decentActionContext';
 import { RouteVars } from '@/lib/contexts/routeSelectContext';
 import { confirmRoute, executeTransaction } from '@/lib/executeTransaction';
 import { useNetwork } from 'wagmi';
-import styles from './onboard.module.css';
 
 interface TokenGroup {
   tokens: TokenInfo[];
