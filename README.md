@@ -25,23 +25,23 @@ Hi 👋.  This is an example repository for [Box Hooks](https://docs.decent.xyz/
     - Coming Soon
   
 ###3. Buy
-    - Please view the documentation for Decent Checkout [here]('https://decentxyz.notion.site/Decent-Checkout-Documentation-2c2904c465e445a2ab52e38807720141') for a full product overview.
-    - This modal enables users to select any ERC20 token on any supported chain and purchase it with fiat.  It takes the following parameters and redirects users to the Checkout URL:
-     - `https://checkout.decent.xyz/?app=onramp&wallet=${connectedAddress}&chain=${dstChain}&token=${dstToken.address}&redir=${REDIRECT_URL}`
-     - `baseUrl`: `https://checkout.decent.xyz`
-     - `onramp`: Decent Checkout includes 3 default applications - a fiat onramp, token bridge, and NFT Checkout
-     - `chain`: the destination chain to which you would like to onramp
-     - `token`: the token you would like to receive on your seelcted chain
-     - `redir`: when the onramp tx is complete, it will redirect back to this URL
+      - Please view the documentation for Decent Checkout [here]('https://decentxyz.notion.site/Decent-Checkout-Documentation-2c2904c465e445a2ab52e38807720141') for a full product overview.
+      - This modal enables users to select any ERC20 token on any supported chain and purchase it with fiat.  It takes the following parameters and redirects users to the Checkout URL:
+      - `https://checkout.decent.xyz/?app=onramp&wallet=${connectedAddress}&chain=${dstChain}&token=${dstToken.address}&redir=${REDIRECT_URL}`
+      - `baseUrl`: `https://checkout.decent.xyz`
+      - `onramp`: Decent Checkout includes 3 default applications - a fiat onramp, token bridge, and NFT Checkout
+      - `chain`: the destination chain to which you would like to onramp
+      - `token`: the token you would like to receive on your seelcted chain
+      - `redir`: when the onramp tx is complete, it will redirect back to this URL
   
  ###4. Onboard
-     - This modal is designed to provide boiler plate code to fill an app-scoped wallet.  You might reference this tab if you are using an MPC wallet solution like Privy or a smart contract wallet with a custom signer in your application.
-     - In this modal we:
-       i. Fetch the token balances across all supported chains for a user.
-         a. Direct the user to onboard with fiat via **Buy** if they do not have any tokens.
-       ii. Prompt the user to select a token, setting the `srcToken`.
-       iii. Bridge from this `srcToken` to a preset `dstToken`.
-         a. This would be the primary token in your appliation; for example, ETH on Base.
-       iv. Bridge from the `srcToken` to the `dstToken` and transfer it to the destination address.
-     - The destination address would be the user's wallet address within your applicaiton.  In a live implementation, you would autofill this address - please refer to [Decent Checkout]('https://decentxyz.notion.site/Decent-Checkout-Documentation-2c2904c465e445a2ab52e38807720141') for further details.
-     - In a live implementation, you would also want to provide the user a field to input how much money they would like to transfer.  For the purposes of this example, we have hardcoded this value
+      - This modal is designed to provide boiler plate code to fill an app-scoped wallet.  You might reference this tab if you are using an MPC wallet solution like Privy or a smart contract wallet with a custom signer in your application.
+      - In this modal we:
+        i. Fetch the token balances across all supported chains for a user.
+          a. Direct the user to onboard with fiat via **Buy** if they do not have any tokens.
+        ii. Prompt the user to select a token, setting the `srcToken`.
+        iii. Bridge from this `srcToken` to a preset `dstToken`.
+          a. This would be the primary token in your appliation; for example, ETH on Base.
+        iv. Bridge from the `srcToken` to the `dstToken` and transfer it to the destination address.
+      - The destination address would be the user's wallet address within your applicaiton.  In a live implementation, you would autofill this address - please refer to [Decent Checkout]('https://decentxyz.notion.site/Decent-Checkout-Documentation-2c2904c465e445a2ab52e38807720141') for further details.
+      - In a live implementation, you would also want to provide the user a field to input how much money they would like to transfer.  For the purposes of this example, we have hardcoded this value
