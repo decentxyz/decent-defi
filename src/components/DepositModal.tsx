@@ -256,11 +256,15 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
           onClick={() => confirmRoute({
             chain: chain!,
             srcChain,
+            // TODO: right now only working with USDC -- need to fix to support any token on the deposit.
             srcToken,
             dstToken,
+            isNative: false,
             setBoxActionArgs,
             updateRouteVars,
+            // Users should specify how much they want to deposit; but we want to calculate based on exactAmountOut so that we can call the deposit function.  See confirmRoute in executeTransaction.ts.
             dstInputVal: srcInputDebounced!,
+            contractAddress: '0xe3b3a464ee575e8e25d2508918383b89c832f275',
             signature: DEPOSIT_SIGNATURE,
             args: [srcInputDebounced, connectedAddress],
             privyWallet,

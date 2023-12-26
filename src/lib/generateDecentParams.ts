@@ -1,6 +1,6 @@
 import { ActionType, TokenInfo } from "@decent.xyz/box-common";
 import { UseBoxActionArgs } from "@decent.xyz/box-hooks";
-import { parseUnits } from "viem";
+import { Address, parseUnits, zeroAddress } from "viem";
 import { usdcToken } from "./constants";
 
 export const generateDecentAmountInParams = ({
@@ -47,17 +47,21 @@ export const generateDecentAmountInParams = ({
 
 export const generateDecentAmountOutParams = ({
   dstToken,
+  isNative,
   dstAmount,
   srcToken = usdcToken,
   connectedAddress,
+  contractAddress,
   toAddress,
   signature,
   args
 }: {
   dstToken: TokenInfo;
+  isNative?: boolean;
   dstAmount?: string;
   srcToken?: TokenInfo;
   connectedAddress?: string;
+  contractAddress?: Address;
   toAddress?: string;
   signature?: string;
   args?: any;
@@ -73,11 +77,12 @@ export const generateDecentAmountOutParams = ({
     throw `no to address`;
   }
   if (signature) {
-    txConfig = makeEvmActionConfig(dstToken, signature, args, dstAmount);
+    txConfig = makeEvmActionConfig(dstToken, signature, args, dstAmount, isNative, contractAddress);
   } else {
     txConfig = makeActionConfig(dstToken, toAddress, dstAmount);
   }
   return {
+    // TODO: refactor to use ArbitraryEvmAction type
     actionType: ActionType.NftMint,
     actionConfig: txConfig,
     srcToken: srcToken.address,
@@ -137,14 +142,17 @@ const makeEvmActionConfig = (
   dstToken: TokenInfo, 
   signature: string, 
   args: any, 
-  dstAmount: string
+  dstAmount: string,
+  isNative?: boolean,
+  contractAddress?: Address
 ) => {
   return {
-    contractAddress: dstToken.address,
+    contractAddress: contractAddress || dstToken.address,
     chainId: dstToken.chainId,
     cost: {
       amount: parseUnits(dstAmount, dstToken.decimals),
-      isNative: true as true,
+      isNative: isNative || true as true,
+      tokenAddress: !isNative ? dstToken.address : zeroAddress,
     },
     signature,
     args,

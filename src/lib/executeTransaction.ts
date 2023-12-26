@@ -1,4 +1,4 @@
-import { Chain, Hex } from "viem";
+import { Chain, Hex, Address } from "viem";
 import { ChainId, TokenInfo, EvmTransaction, BoxActionResponse } from "@decent.xyz/box-common";
 import { toast } from "react-toastify";
 import { 
@@ -14,6 +14,7 @@ export const confirmRoute = async ({
   setBoxActionArgs,
   updateRouteVars,
   connectedAddress,
+  isNative,
   recipient,
   chain,
   srcInputVal,
@@ -23,6 +24,7 @@ export const confirmRoute = async ({
   setSubmitting,
   setShowContinue,
   srcDisplay,
+  contractAddress,
   signature,
   args,
 }: {
@@ -32,6 +34,7 @@ export const confirmRoute = async ({
   setBoxActionArgs: any,
   updateRouteVars: any,
   connectedAddress: string,
+  isNative?: boolean,
   recipient?: string,
   chain?: Chain,
   srcInputVal?: string,
@@ -41,6 +44,7 @@ export const confirmRoute = async ({
   setSubmitting?: (submitting: boolean) => void,
   setShowContinue?: (showContinue: boolean) => void,
   srcDisplay?: string,
+  contractAddress?: Address,
   signature?: string,
   args?: any
 }) => {
@@ -53,7 +57,9 @@ export const confirmRoute = async ({
       connectedAddress,
       toAddress,
       signature,
-      args
+      args,
+      isNative,
+      contractAddress
      } : 
     { 
       srcToken,
@@ -94,7 +100,9 @@ export const confirmRoute = async ({
     setSubmitting?.(false);
   } else {
     setSubmitting?.(false);
-    throw "Can't submit!";
+    toast.error('Error finding route.', {
+      position: toast.POSITION.BOTTOM_CENTER
+    })
   }
 };
 
