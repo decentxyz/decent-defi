@@ -14,13 +14,14 @@ import { useAmtInQuote, useAmtOutQuote } from "../lib/hooks/useSwapQuotes";
 import { BoxActionContext } from "../lib/contexts/decentActionContext";
 import { roundValue } from "../lib/roundValue";
 import { useNetwork } from "wagmi";
-import { Hex } from "viem";
+import { Hex, zeroAddress } from "viem";
 import { useBalance } from "../lib/hooks/useBalance";
 import { confirmRoute, executeTransaction } from "@/lib/executeTransaction";
 import { usdcToken } from "@/lib/constants";
 import Image from "next/image";
+import { parseUnits } from "viem";
 
-export default function SwapModal({ connectedAddress, privyWallet }: any) {
+export default function SwapModal({ connectedAddress, privyWallet, publicClient }: any) {
   //pool together v5 example
   const DEPOSIT_SIGNATURE = 'function deposit(uint256 _assets,address _receiver)';
   
@@ -47,7 +48,7 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
       dstToken: usdcToken,
     });
   }, []);
-
+  
   const { nativeBalance: srcNativeBalance, tokenBalance: srcTokenBalance } =
     useBalance(connectedAddress, srcToken);
   const srcTokenBalanceRounded = roundValue(srcTokenBalance, 2) ?? 0;
@@ -256,7 +257,6 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
           onClick={() => confirmRoute({
             chain: chain!,
             srcChain,
-            // TODO: right now only working with USDC -- need to fix to support any token on the deposit.
             srcToken,
             dstToken,
             isNative: false,
@@ -266,7 +266,7 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
             dstInputVal: srcInputDebounced!,
             contractAddress: '0xe3b3a464ee575e8e25d2508918383b89c832f275',
             signature: DEPOSIT_SIGNATURE,
-            args: [srcInputDebounced, connectedAddress],
+            args: [parseUnits(srcInputDebounced!, 6), connectedAddress],
             privyWallet,
             connectedAddress,
             continueDisabled,
@@ -288,10 +288,13 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
           }
           disabled={confirmDisabled}
           onClick={() => executeTransaction({
+            connectedAddress,
+            srcChain,
             actionResponse,
             setSubmitting,
             setHash,
-            setShowContinue
+            setShowContinue,
+            publicClient
           })}
         >
           Deposit

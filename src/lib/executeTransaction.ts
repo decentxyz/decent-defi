@@ -1,11 +1,12 @@
-import { Chain, Hex, Address } from "viem";
+import { Chain, Hex, Address, zeroAddress } from "viem";
 import { ChainId, TokenInfo, EvmTransaction, BoxActionResponse } from "@decent.xyz/box-common";
 import { toast } from "react-toastify";
 import { 
   generateDecentAmountInParams,
   generateDecentAmountOutParams 
 } from "./generateDecentParams";
-import { sendTransaction } from "@wagmi/core";
+import { sendTransaction, createConfig, configureChains } from "@wagmi/core";
+import { getAllowance, approveToken } from "./approveToken";
 
 export const confirmRoute = async ({
   srcChain,
@@ -107,16 +108,23 @@ export const confirmRoute = async ({
 };
 
 export const executeTransaction = async ({
+  connectedAddress,
+  srcChain,
   actionResponse,
+  publicClient,
   setSubmitting,
   setHash,
   setShowContinue
 }: {
+  connectedAddress: Address | undefined,
+  srcChain: ChainId,
   actionResponse: BoxActionResponse | undefined,
+  publicClient: any
   setSubmitting?: (submitting: boolean) => void,
   setHash?: (hash: Hex) => void,
   setShowContinue?: (showContinue: boolean) => void,
 }) => {
+
   if (!actionResponse) {
     toast.error('Failed to fetch routes', {
       position: toast.POSITION.BOTTOM_CENTER
@@ -124,6 +132,33 @@ export const executeTransaction = async ({
   } else {
     setSubmitting?.(true);
     try {
+      if (
+        actionResponse?.tokenPayment?.tokenAddress &&
+        actionResponse.tokenPayment.tokenAddress != zeroAddress
+      ) {
+        const amountApproved = await getAllowance({
+          user: connectedAddress!,
+          spender: actionResponse.tx.to as Address,
+          token: actionResponse.tokenPayment.tokenAddress as Address,
+        });
+        if (
+          amountApproved < (actionResponse?.tokenPayment?.amount || 0n)
+        ) {
+          const approveHash = await approveToken({
+            token: actionResponse.tokenPayment.tokenAddress as Address,
+            spender: actionResponse.tx.to as Address,
+            amount: actionResponse?.tokenPayment?.amount || 0n,
+          });
+          if (!approveHash) {
+            console.log('not approved!');
+            return;
+          }
+          const approveResult = await publicClient({
+            chainId: srcChain,
+          }).waitForTransactionReceipt({ hash: approveHash });
+          console.log('approved!', approveResult);
+        }
+      }
       const tx = actionResponse.tx as EvmTransaction;
       const { hash } = await sendTransaction(tx);
       setSubmitting?.(false);

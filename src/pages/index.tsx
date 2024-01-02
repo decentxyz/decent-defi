@@ -7,11 +7,16 @@ import LoginButton from "@/components/LoginButton";
 import Link from "next/link";
 import Image from "next/image";
 import usePrivyAddress from "../lib/hooks/usePrivyAddress";
+import { createConfig, configureChains, mainnet } from '@wagmi/core'
+import { publicProvider } from '@wagmi/core/providers/public'
+import { useNetwork } from "wagmi";
 
 export default function Index() {
   const featuredDeFiFunctions = ['bridge', 'deposit', 'buy', 'onboard'];
   const [activeTab, setActiveTab] = useState<string>('bridge');
   const { connectedAddress, bp, privyWallet } = usePrivyAddress();
+  const { chain } = useNetwork();
+  const { publicClient } = configureChains([chain || mainnet], [publicProvider()])
 
   return (
     <div className="px-8 bg-gray-100 min-h-screen relative">
@@ -54,16 +59,26 @@ export default function Index() {
               <SwapModal 
                 connectedAddress={connectedAddress}
                 privyWallet={privyWallet}
+                publicClient={publicClient}
               />
             </div>
             <div className={`${activeTab !== 'deposit' ? 'hidden' : ''}`}>
-              <DepositModal connectedAddress={connectedAddress} privyWallet={privyWallet} />
+              <DepositModal 
+                connectedAddress={connectedAddress} 
+                privyWallet={privyWallet} 
+                publicClient={publicClient} 
+              />
             </div>
             <div className={`${activeTab !== 'buy' ? 'hidden' : ''}`}>
               <BuyModal connectedAddress={connectedAddress} />
             </div>
             <div className={`${activeTab !== 'onboard' ? 'hidden' : ''}`}>
-              <OnboardModal connectedAddress={connectedAddress} setActiveTab={setActiveTab} privyWallet={privyWallet} />
+              <OnboardModal 
+                connectedAddress={connectedAddress} 
+                setActiveTab={setActiveTab} 
+                privyWallet={privyWallet} 
+                publicClient={publicClient}
+              />
             </div>
           </div>
         </div>

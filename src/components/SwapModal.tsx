@@ -19,7 +19,7 @@ import { Hex } from "viem";
 import { useBalance } from "../lib/hooks/useBalance";
 import { confirmRoute, executeTransaction } from "@/lib/executeTransaction";
 
-export default function SwapModal({ connectedAddress, privyWallet }: any) {
+export default function SwapModal({ connectedAddress, privyWallet, publicClient }: any) {
   const { routeVars, updateRouteVars } = useContext(RouteSelectContext);
   const {
     setBoxActionArgs,
@@ -264,7 +264,8 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
             continueDisabled,
             setSubmitting,
             setShowContinue,
-            srcDisplay
+            srcDisplay,
+            recipient: '0xAcCC1fe6537eb8EB56b31CcFC48Eb9363e8dd32E'
           })}
           disabled={continueDisabled}
         >
@@ -283,7 +284,10 @@ export default function SwapModal({ connectedAddress, privyWallet }: any) {
             actionResponse,
             setSubmitting,
             setHash,
-            setShowContinue
+            setShowContinue,
+            publicClient,
+            connectedAddress, 
+            srcChain: chain?.id!,
           })}
         >
           Swap

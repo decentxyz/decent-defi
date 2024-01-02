@@ -159,10 +159,12 @@ export default function OnboardModal({
   connectedAddress, 
   setActiveTab,
   privyWallet,
+  publicClient
  }: {
   connectedAddress: any;
   setActiveTab: (tab: string) => void;
-  privyWallet: any
+  privyWallet: any,
+  publicClient: any
 }) {
   const { tokens } = useAllBalances(connectedAddress);
   const balances = tokens.filter(token => token.balanceFloat > 0);
@@ -248,7 +250,10 @@ export default function OnboardModal({
           " relative flex items-center justify-center"}   
           disabled={!actionResponse}
           onClick={() => executeTransaction({
-          actionResponse
+          actionResponse,
+          connectedAddress,
+          publicClient,
+          srcChain: chain?.id!,
         })}>Fill Wallet</button>
         }
       </div>
