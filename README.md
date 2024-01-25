@@ -45,3 +45,10 @@ Hi 👋. This is an example repository for [Box Hooks](https://docs.decent.xyz/d
   4. Bridge from the `srcToken` to the `dstToken` and transfer it to the destination address.
 - The destination address would be the user's wallet address within your application. In a live implementation, you would autofill this address - please refer to [Decent Checkout]('https://decentxyz.notion.site/Decent-Checkout-Documentation-2c2904c465e445a2ab52e38807720141') for further details.
 - In a live implementation, you would also want to provide the user a field to input how much money they would like to transfer. For the purposes of this example, we have hardcoded this value.
+- 
+
+## Running the project
+
+- `npm i` to install packages
+- `npm run dev` to run locally
+- `npm run build` to build the project
